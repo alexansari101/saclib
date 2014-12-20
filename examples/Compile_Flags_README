@@ -1,0 +1,17 @@
+For DEBUG compile with these flags:
+>> g++ -Wall -Wextra -O0 -g -m64
+
+
+
+For PRODUCTION compile with these flags:
+>> g++ -Wall -Wextra -O2 -m64 -DEIGEN_NO_DEBUG ...
+>> g++ -Wall -Wextra -O2 -funroll-loops -m64 -DEIGEN_NO_DEBUG ...
+>> g++ -Wall -Wextra -Ofast -m64 -DEIGEN_NO_DEBUG ...
+
+ WARNING -Ofast compiles with -O3 -ffast-math which degrades math
+-DEIGEN_NO_DEBUG removes compatibility checks and can make code run faster
+
+
+
+Other useful OPTIONS:
+>> EIGEN_INITIALIZE_MATRICES_BY_ZERO

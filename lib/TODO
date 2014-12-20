@@ -1,0 +1,25 @@
+TODO LIST: 
+
+add virtual destructor to bc_step class
+
+add check to event_detect to ensure 0 crossing found w/in tolerance
+
+figure out why u2* search is not working in bounce.cpp
+
+make jump_rho in bc_impact_step more general or move to main cpp file
+
+accept projection operator callable in cost.hpp and inc_cost.hpp
+
+better encapsulate impact & event code - bc_impact_step, event_detect/exec
+
+implement pendubot dynamics/linearizations like acrobot
+
+implement Q / P / R matrices as classes so they can be functions of x / u / t
+
+use trep for function derivative evaluations
+
+create continuous control objects
+
+class fb_sys_dynam needs to be better thought out & integrated
+
+nothing stops LQR feedback from being > usat
