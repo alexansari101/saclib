@@ -113,7 +113,6 @@ void initialize() {
    Projection for calculations involving x(t) */
 inline void state_proj( state_type & x ) {
   AngleWrap( x[0] );
-  AngleWrap( x[2] );
 }
 
 
