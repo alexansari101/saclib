@@ -19,8 +19,6 @@ namespace sac {
   namespace init {
     using namespace std;
     //[ initialization    
-    /* Search for or just apply u2* at t0? */
-    bool u2Search = false;
     state_type x(xlen), u_switch(ulen), t_curr(3);
     //
     sac_step SACit( u2Search, get_DesTraj ); 
@@ -115,6 +113,7 @@ void initialize() {
    Projection for calculations involving x(t) */
 inline void state_proj( state_type & x ) {
   AngleWrap( x[0] );
+  AngleWrap( x[2] );
 }
 
 

@@ -21,6 +21,20 @@ int main(int /* argc */ , char** /* argv */ )
     /* initialization */
     initialize();
 
+    //[ TEST
+    Params p(4,1);
+    p.T() = 0.28;
+    p.lam() = -10;
+    p.maxdt() = 0.2;
+    p.ts() = 0.001;
+    // p.usat() = { {25, -25} };
+    p.calc_tm() = ts;
+    // p.Q() = Eigen::Matrix<double, 4,4>::Zero(4,4);
+    // p.P() = Eigen::Matrix<double, 4,4>::Zero(4,4);
+    // p.P()(0,0) = 500;
+    // p.R() << 0.3;
+    //]
+
     /* simulation start/stop times */
     double t0=0.0, tsim = 10;
     
