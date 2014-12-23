@@ -12,8 +12,8 @@ using namespace sac;
 void initialize();
 std::vector<double> sac_stepper(std::vector<double> xinit, double tinit);
 inline void state_proj( state_type & x );  // required by traj_cost class
-inline void get_DesTraj( const double t, 
-			        Eigen::Matrix< double, xlen, 1 > &m_mxdes );
+inline void get_DesTraj( const double t, const state_type &x,
+			 Eigen::MatrixXd &m_mxdes );
 
 namespace sac {
   namespace init {
@@ -118,8 +118,9 @@ inline void state_proj( state_type & x ) {
 
 /*******************************************
    outputs a point in the desired trajectory at time t */
-inline void get_DesTraj( const double /*t*/, 
-			 Eigen::Matrix< double, xlen, 1 > &m_mxdes ) {
+inline void get_DesTraj( const double /*t*/,
+			 const state_type &/*x*/,
+			 Eigen::MatrixXd &m_mxdes ) {
   m_mxdes << 0, 0, 0, 0;
 }
 

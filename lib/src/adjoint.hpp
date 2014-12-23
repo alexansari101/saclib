@@ -12,9 +12,9 @@ namespace sac {
   */
   class adjoint {
     state_type x_, u1_, rho_;
-    Eigen::Matrix< double, xlen, 1 > mx_, mrho_, mrhodot_;
-    Eigen::Matrix< double, 1, xlen > mdldx_;
-    Eigen::Matrix< double, xlen, xlen > mdfdx_;
+    Eigen::MatrixXd mx_, mrho_, mrhodot_;
+    Eigen::MatrixXd mdldx_;
+    Eigen::MatrixXd mdfdx_;
     size_t indx_;
 
   public:
@@ -32,7 +32,10 @@ namespace sac {
     */
     adjoint( state_intp & x_intp,
 	     cost & J ) :  x_(xlen), u1_(ulen),
-			   rho_(xlen), m_x_intp( x_intp ),
+			   rho_(xlen), mx_(xlen,1),
+			   mrho_(xlen,1), mrhodot_(xlen,1),
+			   mdldx_(1,xlen), mdfdx_(xlen,xlen),
+			   m_x_intp( x_intp ),
 			   m_lofx(J.m_lofx) {  
       for ( size_t i=0; i<ulen; i++ ) { u1_[i] = 0.0; } 
     }
@@ -58,7 +61,7 @@ namespace sac {
       //
       mrhodot_ = -mdldx_.transpose() - mdfdx_.transpose()*mrho_;
       //
-      for (indx_ = 0; indx_ < xlen; indx_++ ) { rhodot[indx_] = mrhodot_[indx_]; }
+      for (indx_ = 0; indx_ < xlen; indx_++ ) { rhodot[indx_] = mrhodot_(indx_); }
     }
   };
 

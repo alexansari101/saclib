@@ -10,7 +10,7 @@ namespace sac {
     double alpha, min_val, dtt_win, dt_win;
     state_type x, rho;  state_type u_switch;  
     sys_dynam xdot;  adjoint rho_dot;
-    Eigen::Matrix< double, xlen, 1 > m_mrho_tf;
+    Eigen::MatrixXd m_mrho_tf;
     u2_optimal u2Opt;  mode_insert_grad dJdlam;
     double dJdlam_curr;   u2_cost cntrlCost;
     std::vector<double> lclMin;
@@ -24,14 +24,14 @@ namespace sac {
     std::vector<state_type> x_vec, rho_vec;    
     std::vector<double> times, rho_times;
     bool u2Search;  size_t its, max_its;
-    Eigen::Matrix< double, xlen, 1 > m_mxdes_tf;
+    Eigen::MatrixXd m_mxdes_tf;
     
     sac_step( const bool usearch, 
-    	      void (*xdesFnptr) ( const double t, 
-    				  Eigen::Matrix< double, xlen, 1 > &m_mxdes )
+    	      void (*xdesFnptr) ( const double t, const state_type &x, 
+    				  Eigen::MatrixXd &m_mxdes )
     	     ) : dt_win(maxdt/2.0), x(xlen), rho(xlen), 
     		 u_switch(ulen), xdot(u), rho_dot(x_intp, J1),
-    		 u2Opt(x_intp, rho_intp, alpha),
+		 m_mrho_tf(xlen,1), u2Opt(x_intp, rho_intp, alpha),
     		 dJdlam( x_intp, rho_intp, u2Opt ),
     		 cntrlCost( u2Opt, dJdlam ),
     		 J1(x_intp, xdesFnptr, m_mxdes_tf),
@@ -39,14 +39,12 @@ namespace sac {
     		 x_intp(x_vec , times, xlen),
     		 rho_intp(rho_vec , rho_times, xlen),
     		 x0noU(xlen), u(ulen), u2Search(usearch),
-                 max_its(4), m_mxdes_tf( Eigen::Matrix
-    					 < double, xlen, 1 >
-    					 ::Zero(xlen,1)) { }
+                 max_its(4), m_mxdes_tf( Eigen::MatrixXd::Zero(xlen,1)) { }
     
     //[ TESTING
     // sac_step( Params & p, 
-    // 	      void (*xdesFnptr) ( const double t, 
-    // 				  Eigen::Matrix< double, xlen, 1 > &m_mxdes )
+    // 	      void (*xdesFnptr) ( const double t, , const state_type &x
+    // 				  Eigen::MatrixXd &m_mxdes )
     // 	      ) : dt_win(p.maxdt()/2.0), x(p.xlen()), rho(p.xlen()), 
     // 		  u_switch(p.ulen()), xdot(u), rho_dot(x_intp, J1),
     // 		  u2Opt(x_intp, rho_intp, alpha),
@@ -57,9 +55,7 @@ namespace sac {
     // 		  x_intp(x_vec , times, p.xlen()),
     // 		  rho_intp(rho_vec , rho_times, p.xlen()),
     // 		  x0noU(p.xlen()), u(p.ulen()), u2Search(p.u2search()),
-    //               max_its(4), m_mxdes_tf( Eigen::Matrix
-    // 					  < double, xlen, 1 >
-    // 					  ::Zero(xlen,1)) { }
+    //               max_its(4), m_mxdes_tf( Eigen::MatrixXd::Zero(xlen,1)) { }
     //]
     
     inline virtual void SimInitXRho( double &t0, const state_type &x0, 
@@ -157,7 +153,7 @@ namespace sac {
     x_intp( t0+ts, x0noU );
     rho_vec.clear(); rho_times.clear();  // empty the vectors
     m_mrho_tf = J1.get_dmdx( );
-    for ( j = 0; j < xlen; j++ ) { rho[j] = m_mrho_tf[j]; }
+    for ( j = 0; j < xlen; j++ ) { rho[j] = m_mrho_tf(j); }
     steps = simRho( rho_dot, rho, t0, tf, rho_vec, rho_times );    
   }
 

@@ -10,13 +10,12 @@ namespace sac {
   class inc_state_cost {
     state_intp & rx_intp_;
     void (*p_state_Proj) ( state_type & x );      // pointer to function to project state
-    void (*p_get_DesTraj)( const double t,        // pointer to function
-			   Eigen::Matrix< double, // to get desired trajectory
-			   xlen, 1 > &mxdes );
-    Eigen::Matrix< double, xlen, 1 > mxdes_;
-    Eigen::Matrix< double, xlen, xlen > & rmQ_;
+    void (*p_get_DesTraj)( const double t, const state_type &x,
+			   Eigen::MatrixXd &mxdes ); // desired trajectory
+    Eigen::MatrixXd mxdes_;
+    Eigen::MatrixXd & rmQ_;
     state_type x_;
-    Eigen::Matrix< double, xlen, 1 > mx_;
+    Eigen::MatrixXd mx_;
 
   public:
 
@@ -31,16 +30,16 @@ namespace sac {
     */
     inc_state_cost( state_intp & rx_intp,
 		    void (*xProjFnptr) ( state_type & x ),
-		    void (*xdesFnptr) ( const double t, 
-					Eigen::Matrix< double, xlen, 1 > &mxdes ),
-		    Eigen::Matrix< double, xlen, xlen > & rmQ
+		    void (*xdesFnptr) ( const double t, const state_type &x,
+					Eigen::MatrixXd &mxdes ),
+		    Eigen::MatrixXd & rmQ
 		    ) : rx_intp_( rx_intp ),		      
 			p_state_Proj( xProjFnptr ),
 			p_get_DesTraj( xdesFnptr ), 
-			mxdes_( Eigen::Matrix< double,xlen,1 >::Zero(xlen,1) ),
+			mxdes_( Eigen::MatrixXd::Zero(xlen,1) ),
 			rmQ_( rmQ ),
 			x_(xlen),
-			mx_( Eigen::Matrix< double,xlen,1 >::Zero(xlen,1) ) { }
+			mx_( Eigen::MatrixXd::Zero(xlen,1) ) { }
 
 
     /*!
@@ -55,10 +54,10 @@ namespace sac {
       p_state_Proj( x_ ); // project state if necessary
       State2Mat( x_, mx_ ); // convert state to matrix form
       //
-      p_get_DesTraj( t, mxdes_ ); // Store desired trajectory point in m_mxdes
+      p_get_DesTraj( t, x_, mxdes_ ); // Get desired trajectory point
       //
       dJdt[0] = ( ( (mx_- mxdes_).transpose() * rmQ_ 
-		    * (mx_- mxdes_) ) / 2.0 )[0];
+		    * (mx_- mxdes_) ) / 2.0 )(0);
     }
 
 
@@ -80,13 +79,13 @@ namespace sac {
     state_intp & rx_intp_;
     void (*p_state_Proj) ( state_type & x );      // pointer to function to project state
     std::vector<state_type> & ru2list_, & rTiTappTf_;
-    const Eigen::Matrix< double, xlen, 1 > & rmxdes_tf_;
-    Eigen::Matrix< double, xlen, xlen > mQ_;
-    Eigen::Matrix< double, xlen, xlen > mP1_;
-    Eigen::Matrix< double, ulen, ulen > mR_;
+    const Eigen::MatrixXd & rmxdes_tf_;
+    Eigen::MatrixXd mQ_;
+    Eigen::MatrixXd mP1_;
+    Eigen::MatrixXd mR_;
     state_type x_, cost_;
-    Eigen::Matrix< double, xlen, 1 > mx_;
-    Eigen::Matrix< double, ulen, 1 > mu2_;
+    Eigen::MatrixXd mx_;
+    Eigen::MatrixXd mu2_;
     double integ_state_cost_, u2cost_, term_cost_;
     inc_state_cost inc_tracking_cost_;
 
@@ -108,21 +107,21 @@ namespace sac {
 	       void (*xProjFnptr) ( state_type & x ),
 	       std::vector<state_type> & ru2list,
 	       std::vector<state_type> & rTiTappTf,
-	       void (*xdesFnptr) ( const double t, 
-				   Eigen::Matrix< double, xlen, 1 > &mxdes ),
-	       const Eigen::Matrix< double, xlen, 1 > & rmxdes_tf
+	       void (*xdesFnptr) ( const double t, const state_type &x, 
+				   Eigen::MatrixXd &mxdes ),
+	       const Eigen::MatrixXd & rmxdes_tf
 	       ) : rx_intp_( rx_intp ),
 		   p_state_Proj( xProjFnptr ),
 		   ru2list_( ru2list ),
 		   rTiTappTf_( rTiTappTf ),
 		   rmxdes_tf_( rmxdes_tf ),
-		   mQ_( Eigen::Matrix< double,xlen,xlen >::Identity(xlen,xlen) ),
-                   mP1_( Eigen::Matrix< double,xlen,xlen >::Zero(xlen,xlen) ),
-                   mR_( Eigen::Matrix< double,ulen,ulen >::Identity(ulen,ulen) ),
+		   mQ_( Eigen::MatrixXd::Identity(xlen,xlen) ),
+                   mP1_( Eigen::MatrixXd::Zero(xlen,xlen) ),
+                   mR_( Eigen::MatrixXd::Identity(ulen,ulen) ),
                    x_(xlen),
                    cost_(1),
-                   mx_( Eigen::Matrix< double,xlen,1 >::Zero(xlen,1) ),
-                   mu2_( Eigen::Matrix< double,ulen,1 >::Zero(ulen,1) ),
+                   mx_( Eigen::MatrixXd::Zero(xlen,1) ),
+                   mu2_( Eigen::MatrixXd::Zero(ulen,1) ),
                    integ_state_cost_(0.0), 
                    u2cost_(0.0),
                    term_cost_(0.0),
@@ -167,22 +166,22 @@ namespace sac {
     }
 
     /*!
-      get using:      Eigen::Matrix< double, xlen, xlen > rQ = J_traj.Q();
-      get ref using:  Eigen::Matrix< double, xlen, xlen > & rQ = J_traj.Q();
+      get using:      Eigen::MatrixXd rQ = J_traj.Q();
+      get ref using:  Eigen::MatrixXd & rQ = J_traj.Q();
       set using:      J_traj.Q() << 1000, 0, 0, 10;
       \return A reference to the mQ_ weight matrix for both getting and setting
     */
-    Eigen::Matrix< double, xlen, xlen > & Q( ) { return mQ_; }
+    Eigen::MatrixXd & Q( ) { return mQ_; }
 
     /*!
       \return A reference to the mP1_ weight matrix for both getting and setting
     */
-    Eigen::Matrix< double, xlen, xlen > & P( ) { return mP1_; }
+    Eigen::MatrixXd & P( ) { return mP1_; }
 
     /*!
       \return A reference to the mR_ weight matrix for both getting and setting
     */
-    Eigen::Matrix< double, ulen, ulen > & R( ) { return mR_; }
+    Eigen::MatrixXd & R( ) { return mR_; }
 
   };
   //]
@@ -205,7 +204,7 @@ namespace sac {
     p_state_Proj( x_ ); // project state if necessary
     State2Mat( x_, mx_ ); // convert state to matrix form
     cost_[0] = ( ( (mx_- rmxdes_tf_).transpose() * mP1_ 
-		   * (mx_- rmxdes_tf_) ) / 2.0 )[0];
+		   * (mx_- rmxdes_tf_) ) / 2.0 )(0);
     term_cost_ = cost_[0];
   
     // integrate appending incremental state tracking cost to terminal cost
@@ -237,7 +236,7 @@ namespace sac {
       if ( dt > eps) {
 	State2Mat( ru2list_[i], mu2_ ); // convert state to matrix form
 	u2cost_ += ( ( mu2_.transpose() * mR_ 
-		       * mu2_ ) * dt )[0];
+		       * mu2_ ) * dt )(0);
       }
     }
   

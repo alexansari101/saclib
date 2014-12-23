@@ -11,14 +11,16 @@ namespace sac {
     state_type x_, rho_, u1_;
     sys_lin lin_;
     inc_cost & lofx_;
-    Eigen::Matrix< double, xlen, 1 > mx_, mrho_, mrhodot_;
-    Eigen::Matrix< double, 1, xlen > mdldx_;
-    Eigen::Matrix< double, xlen, xlen > mdfdx_;
+    Eigen::MatrixXd mx_, mrho_, mrhodot_;
+    Eigen::MatrixXd mdldx_;
+    Eigen::MatrixXd mdfdx_;
   
   public:
     adjoint( state_intp & x_intp,
 	     cost & J ) :  rx_intp_( x_intp ), g_(9.81), x_(xlen),
-			   rho_(xlen), u1_(ulen), lofx_(J.m_lofx) {  
+			   rho_(xlen), u1_(ulen), lofx_(J.m_lofx),
+			   mx_(xlen,1), mrho_(xlen,1), mrhodot_(xlen,1),
+			   mdldx_(1,xlen), mdfdx_(xlen,xlen) {  
       for ( size_t i=0; i<ulen; i++ ) { u1_[i] = 0.0; } 
     }
 
@@ -31,13 +33,13 @@ namespace sac {
       //
       lin_.A( x_, u1_, mdfdx_ );
       //
-      AngleWrap( mx_[0] ); // Only for angle wrapping
+      AngleWrap( mx_(0) ); // Only for angle wrapping
       //
       lofx_.dx( t, mx_, mdldx_ );
       //
       mrhodot_ = -mdldx_.transpose() - mdfdx_.transpose()*mrho_;
       //
-      for (indx_ = 0; indx_ < xlen; indx_++ ) { rhodot[indx_] = mrhodot_[indx_]; }
+      for (indx_ = 0; indx_ < xlen; indx_++ ) { rhodot[indx_] = mrhodot_(indx_); }
     }
   };
   //]

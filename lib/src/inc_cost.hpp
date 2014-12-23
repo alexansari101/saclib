@@ -11,15 +11,14 @@ namespace sac {
     accounted for.
   */
   class inc_cost {
-    Eigen::Matrix< double, xlen, 1 > mx_;
-    void (*p_get_DesTraj)( const double t,        // pointer to function
-			   Eigen::Matrix< double, // to get desired trajectory
-			   xlen, 1 > &mxdes );
+    Eigen::MatrixXd mx_;
+    void (*p_get_DesTraj)( const double t, const state_type &x,
+			   Eigen::MatrixXd &mxdes ); // desired trajectory
   
   public:
     state_intp & m_x_intp; // store current state
     state_type m_x;
-    Eigen::Matrix< double, xlen, 1 > m_mxdes;
+    Eigen::MatrixXd m_mxdes;
   
     //! \todo Alex: make inputs const ref type
     /*!
@@ -29,12 +28,12 @@ namespace sac {
       \param[in] xdesFnptr Pointer to the desired trajectory
     */
     inc_cost( state_intp & x_intp,
-	      void (* xdesFnptr) ( const double t, 
-				   Eigen::Matrix< double, xlen, 1 > &mxdes ) 
-	      ): mx_(Eigen::Matrix< double,xlen,1 >::Zero(xlen,1)), 
+	      void (* xdesFnptr) ( const double t, const state_type &x
+				   Eigen::MatrixXd &mxdes ) 
+	      ): mx_(Eigen::MatrixXd::Zero(xlen,1)), 
 		 p_get_DesTraj( xdesFnptr ),
 		 m_x_intp( x_intp ), m_x( xlen ),
-		 m_mxdes(Eigen::Matrix< double,xlen,1 >::Zero(xlen,1)) { }
+		 m_mxdes(Eigen::MatrixXd::Zero(xlen,1)) { }
   
     /*!
       Computes the value of incremental trajectory tracking cost, \f$l(x)\f$.
@@ -47,10 +46,10 @@ namespace sac {
       m_x_intp(t, m_x); // store the current state in x
       State2Mat( m_x, mx_ ); // convert state to matrix form
       //
-      p_get_DesTraj( t, m_mxdes ); // Store desired trajectory point in m_mxdes
+      p_get_DesTraj( t, m_x, m_mxdes ); // Get desired trajectory point
       //
       dJdt[0] = ( ( (mx_-m_mxdes).transpose() * Q 
-		    * (mx_-m_mxdes) ) / 2.0 )[0];
+		    * (mx_-m_mxdes) ) / 2.0 )(0);
     }
 
     /*!
@@ -60,9 +59,10 @@ namespace sac {
       \param[in] mx The current state
       \param[out] dldx The derivative \f$D_x l(x)\f$.
     */
-    inline void dx( const double t, const Eigen::Matrix< double, xlen, 1 > &mx,
-		    Eigen::Matrix< double, 1, xlen > &dldx ) { 
-      p_get_DesTraj( t, m_mxdes ); // Store desired trajectory point in m_mxdes
+    inline void dx( const double t, const Eigen::MatrixXd &mx,
+		    Eigen::MatrixXd &dldx ) { 
+      Mat2State( mx, m_x);
+      p_get_DesTraj( t, m_x, m_mxdes ); // Get desired trajectory point
       //
       dldx = (mx-m_mxdes).transpose()*Q;
     }

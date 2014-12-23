@@ -20,9 +20,9 @@ namespace sac {
     state_type rho_curr_;
     double & alpha_;
     state_type u1_;
-    Eigen::Matrix< double, ulen, 1 >  mrslt_, mu1_;
-    Eigen::Matrix< double, xlen, 1 > mx_curr_, mrho_curr_;
-    Eigen::Matrix< double, xlen, ulen > B_;
+    Eigen::MatrixXd  mrslt_, mu1_;
+    Eigen::MatrixXd mx_curr_, mrho_curr_;
+    Eigen::MatrixXd B_;
     sys_lin lin_;
     size_t i_;
   
@@ -42,7 +42,10 @@ namespace sac {
 		double & alpha ) : rx_intp_( x_intp ) ,
 				   rrho_intp_( rho_intp ) ,
 				   x_curr_(xlen) , rho_curr_(xlen) , 
-				   alpha_( alpha ) , u1_(ulen) { 
+				   alpha_( alpha ) , u1_(ulen),
+				   mrslt_(ulen,1), mu1_(ulen,1),
+				   mx_curr_(xlen,1), mrho_curr_(xlen,1),
+				   B_(xlen,ulen) { 
       for ( i_=0; i_<ulen; i_++ ) {
 	u1_[i_] = 0.0;
 	mu1_(i_,0) = 0.0;
