@@ -24,19 +24,19 @@ namespace sac {
     User interface for specifying parameters required by SAC 
    */
   class Params {
-    const size_t xlen_; //! state dimension
-    const size_t ulen_; //! control dimension
-    double T_;          //! prediction horizon
-    double lam_;        //! descent rate (should be < 0)
-    double maxdt_;      //! initial (max) duration for control application
-    double ts_;         //! sampling time (duration between control calcs)
-    //    double *usat_;      //! control saturation ranges
-    double calc_tm_;    //! time assumed for SAC calcs
-    bool u2search_;     //! search for best time to apply control?
+    const size_t xlen_;   //! state dimension
+    const size_t ulen_;   //! control dimension
+    double T_;            //! prediction horizon
+    double lam_;          //! descent rate (should be < 0)
+    double maxdt_;        //! initial (max) duration for control application
+    double ts_;           //! sampling time (duration between control calcs)
+    // std::vector< std::vector<double> > usat_;  //! control saturation ranges
+    double calc_tm_;      //! time assumed for SAC calcs
+    bool u2search_;       //! search for best time to apply control?
     /* cost parameters */
-    // Eigen::Matrix< double, xlen_, xlen_ > mQ_;
-    // Eigen::Matrix< double, xlen_, xlen_ > mP1_;
-    // Eigen::Matrix< double, ulen_, ulen_ > mR_;
+    // Eigen::MatrixXd mQ_;  //! incremental quadratic state cost weights 
+    // Eigen::MatrixXd mP1_; //! terminal quadratic cost weights
+    // Eigen::MatrixXd mR_;  //! incremental quadratic control cost weights
   public:
     /*!
       Constructor for Params class to hold SAC parameters.
@@ -47,12 +47,15 @@ namespace sac {
 	    const size_t ulen ) : xlen_(xlen), ulen_(ulen), 
 				  T_(.5), lam_(-5), maxdt_(0.2), 
 				  ts_(0.01), 
-				  // usat_(new double(ulen * 2)), 
-				  calc_tm_(ts_), u2search_(false) 
+				  // usat_(ulen, std::vector<double>(2)), 
+				  calc_tm_(ts_), u2search_(false)
+				  // mQ_(xlen,xlen), mP1_(xlen,xlen),
+				  // mR_(ulen,ulen)
     { 
-      // for ( size_t i=0; i<ulen; i++ ) {
-      // 	usat_[i][0] = 100;  // default saturation limits
-      // 	usat_[i][1] = -100; // default saturation limits
+      // for ( size_t i=0; i<ulen_; i++ ) {
+      // 	// usat_[i][0] = 100;  // default saturation limits
+      // 	// usat_[i][0] = -100; // default saturation limits
+      // 	usat_[i] = {100, -100};
       // }
     }
 
@@ -93,10 +96,10 @@ namespace sac {
     double & ts() { return ts_; }
     
     // /*!
-    //   \return A reference to the initial (max) duration for control 
-    //   application used in searching for a valid application duration
+    //   \return A reference to a 2d vector holding the [max min] saturation 
+    //   values for each element of the control vector
     // */
-    // double & usat() { return usat_; }
+    // std::vector<std::vector<double> > & usat() { return usat_; }
 
     /*!
       \return A reference to the time that each SAC control calculation is 
@@ -114,22 +117,22 @@ namespace sac {
     bool & u2search() { return u2search_; }
 
     // /*!
-    //   get using:      Eigen::Matrix< double, xlen, xlen > rQ = J_traj.Q();
-    //   get ref using:  Eigen::Matrix< double, xlen, xlen > & rQ = J_traj.Q();
+    //   get using:      Eigen::MatrixXd rQ = J_traj.Q();
+    //   get ref using:  Eigen::MatrixXd & rQ = J_traj.Q();
     //   set using:      param.Q() << 1000, 0, 0, 10;
     //   \return A reference to the mQ_ weight matrix for both getting and setting
     // */
-    // Eigen::Matrix< double, xlen, xlen > & Q( ) { return mQ_; }
+    // Eigen::MatrixXd & Q( ) { return mQ_; }
 
     // /*!
     //   \return A reference to the mP1_ weight matrix for both getting and setting
     // */
-    // Eigen::Matrix< double, xlen, xlen > & P( ) { return mP1_; }
+    // Eigen::MatrixXd & P( ) { return mP1_; }
 
     // /*!
     //   \return A reference to the mR_ weight matrix for both getting and setting
     // */
-    // Eigen::Matrix< double, ulen, ulen > & R( ) { return mR_; }
+    // Eigen::MatrixXd & R( ) { return mR_; }
     
   };
 }

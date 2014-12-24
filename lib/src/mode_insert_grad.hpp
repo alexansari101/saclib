@@ -18,7 +18,7 @@ namespace sac {
     b_control u1_, u2_;
     sys_dynam xdot1_, xdot2_;
     state_type dxdt1_, dxdt2_;
-    Eigen::Matrix< double, xlen, 1 > mrho_curr_, mxdot1_ , mxdot2_;
+    Eigen::MatrixXd mrho_curr_, mxdot1_ , mxdot2_;
   
   public:
     //! \todo Alex: make inputs const ref type
@@ -35,7 +35,10 @@ namespace sac {
 					     rho_curr_(xlen) , u2_curr_(ulen) ,
 					     u1_(ulen) , u2_(ulen) ,
 					     xdot1_(u1_) , xdot2_(u2_) , 
-					     dxdt1_(xlen) ,  dxdt2_(xlen) { }
+					     dxdt1_(xlen) ,  dxdt2_(xlen),
+					     mrho_curr_(xlen,1), 
+					     mxdot1_(xlen,1) ,
+					     mxdot2_(xlen,1) { }
   
     /*!
       Computes the value of the mode insertion gradient, \f$\frac{dJ1}
@@ -60,7 +63,7 @@ namespace sac {
       xdot2_( x_curr_, dxdt2_, t );
       State2Mat( dxdt2_, mxdot2_ );
       //
-      dJdlam_curr = ( mrho_curr_.transpose()*( mxdot2_ - mxdot1_ ) )[0];
+      dJdlam_curr = ( mrho_curr_.transpose()*( mxdot2_ - mxdot1_ ) )(0);
     }
   };
 
