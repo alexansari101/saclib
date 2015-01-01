@@ -3,13 +3,12 @@
 #define CARTPEND_HPP
 
 #include <iostream>
-#include "setting.hpp"              // Project globals & settings
 #include <master.hpp>               // Master include file
 
 using namespace sac;
 
 /* Required by lib fuctions */
-void initialize();
+// void initialize();
 std::vector<double> sac_stepper(std::vector<double> xinit, double tinit);
 inline void state_proj( state_type & x );  // required by traj_cost class
 inline void get_DesTraj( const double t, const state_type &x,
@@ -21,7 +20,8 @@ namespace sac {
     //[ initialization    
     state_type x(xlen), u_switch(ulen), t_curr(3);
     //
-    sac_step SACit( u2Search, get_DesTraj ); 
+    // sac_step SACit( &params, get_DesTraj );
+    sac_step SACit( u2Search, get_DesTraj );
     vector<state_type> &x_vec = SACit.x_vec, x_out, u2list, TiTappTf;
     vector<double> &times = SACit.times;
     state_intp x_intp(x_vec, times, xlen);
@@ -62,7 +62,7 @@ std::vector<double> sac_stepper(std::vector<double> & xinit,
     /* Perform SAC iteration - updates: J0, Jn, u, x_intp */
     SACit( tinit, xinit, u_default, tinit, tinit+calc_tm );	  	
 
-    /* Get new u & switching times */
+    // /* Get new u & switching times */
     u( t_i, u_switch );   
  
     if ( Jn > J0 ) { // cost increased so don't apply control
@@ -76,6 +76,16 @@ std::vector<double> sac_stepper(std::vector<double> & xinit,
       t_curr[0]=t_i; t_curr[1]=t_app;  
       t_curr[2]=t_f; // return time horizon
     }
+    
+    //[ TEST
+    // if ( Jn > J0 ) { // cost increased so don't apply control
+    //   xinit = x0noU;    // return x
+    // }
+    // else { 
+    //   x_intp( tinit+ts, xinit );
+    // }
+    // t_curr[0]=t_i; t_curr[1]=t_app; t_curr[2]=t_f;
+    //]
     
     std::vector<double> rvec; // return vec
     rvec.push_back( xinit[0] );
@@ -91,22 +101,22 @@ std::vector<double> sac_stepper(std::vector<double> & xinit,
 }
 
 
-/*******************************************
-   Initialize */
-void initialize() {
-  using namespace sac::init;
-  Q << 0, 0, 0, 0,  // 200            // Q weight matrix
-    0, 0, 0, 0,       // 0
-    0, 0, 0, 0,     // 100
-    0, 0, 0, 0;      // 50
-  P << 500, 0, 0, 0,    // 0              // P weight matrix
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-    0, 0, 0, 0;
-  R << 0.3;           // 0.3             // R weight matrix
+// /*******************************************
+//    Initialize */
+// void initialize() {
+//   using namespace sac::init;
+//   Q << 0, 0, 0, 0,  // 200            // Q weight matrix
+//     0, 0, 0, 0,       // 0
+//     0, 0, 0, 0,     // 100
+//     0, 0, 0, 0;      // 50
+//   P << 500, 0, 0, 0,    // 0              // P weight matrix
+//     0, 0, 0, 0,
+//     0, 0, 0, 0,
+//     0, 0, 0, 0;
+//   R << 0.3;           // 0.3             // R weight matrix
 
-  // u_default[0] = 0.0;
-}
+//   // u_default[0] = 0.0;
+// }
 
 
 /*******************************************

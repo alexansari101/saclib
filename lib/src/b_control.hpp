@@ -40,8 +40,6 @@ namespace sac {
       else { u_curr =  u_default_; }
     }
 
-    //! \todo Alex: Think about using getter/setter functions to set u_switch
-    //!  when saturation is desired and directly accessing u_switch when not.
     /*!
       Sets the value of the switching control when \f$\tau_1 \leq t \leq 
       \tau_2\f$.  Also applies saturation to the vector.

@@ -19,28 +19,25 @@ int main(int /* argc */ , char** /* argv */ )
     boost::timer::auto_cpu_timer t(4, "%w seconds\n");
 
     /* initialization */
-    initialize();
-
-    //[ TEST
-    Params p(4,1);
-    p.T() = 0.28;
-    p.lam() = -10;
-    p.maxdt() = 0.2;
-    p.ts() = 0.001;
-    // p.usat() = { {25, -25} };
-    p.calc_tm() = ts;
-    // p.Q() = Eigen::Matrix<double, 4,4>::Zero(4,4);
-    // p.P() = Eigen::Matrix<double, 4,4>::Zero(4,4);
-    // p.P()(0,0) = 500;
-    // p.R() << 0.3;
-    //]
+    // Params params(4,1);
+    params.T() = 0.28;
+    params.lam() = -10;
+    params.maxdt() = 0.2;
+    params.ts() = 0.001;
+    params.usat() = { {25, -25} };
+    params.calc_tm() = ts;
+    params.u2search() = false;
+    params.Q() = Eigen::Matrix<double, 4,4>::Zero(4,4);
+    params.P() = Eigen::Matrix<double, 4,4>::Zero(4,4);
+    params.P()(0,0) = 500;
+    params.R() << 0.3;
 
     /* simulation start/stop times */
     double t0=0.0, tsim = 10;
     
     /* initial state and control */
     state_type x0(xlen), u_default(ulen);
-    x0 = { PI, 0, 0, 0 };  t_curr = { 0.0, 0.0, calc_tm };
+    x0 = { PI, 0, 0, 0 };  t_curr = { 0.0, 0.0, params.calc_tm() };
     u_switch = { 0 };
 
     /* compute final trajectory cost */

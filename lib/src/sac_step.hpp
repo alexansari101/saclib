@@ -42,20 +42,21 @@ namespace sac {
                  max_its(4), m_mxdes_tf( Eigen::MatrixXd::Zero(xlen,1)) { }
     
     //[ TESTING
-    // sac_step( Params & p, 
-    // 	      void (*xdesFnptr) ( const double t, , const state_type &x
-    // 				  Eigen::MatrixXd &m_mxdes )
-    // 	      ) : dt_win(p.maxdt()/2.0), x(p.xlen()), rho(p.xlen()), 
-    // 		  u_switch(p.ulen()), xdot(u), rho_dot(x_intp, J1),
-    // 		  u2Opt(x_intp, rho_intp, alpha),
-    // 		  dJdlam( x_intp, rho_intp, u2Opt ),
-    // 		  cntrlCost( u2Opt, dJdlam ),
-    // 		  J1(x_intp, xdesFnptr, m_mxdes_tf),
-    // 		  t_i(p.T()), t_f(p.T()), tf(p.T()), 
-    // 		  x_intp(x_vec , times, p.xlen()),
-    // 		  rho_intp(rho_vec , rho_times, p.xlen()),
-    // 		  x0noU(p.xlen()), u(p.ulen()), u2Search(p.u2search()),
-    //               max_its(4), m_mxdes_tf( Eigen::MatrixXd::Zero(xlen,1)) { }
+    sac_step( Params & p, 
+    	      void (*xdesFnptr) ( const double t, const state_type &x,
+    				  Eigen::MatrixXd &m_mxdes )
+    	      ) : dt_win(p.maxdt()/2.0), x(p.xlen()), rho(p.xlen()), 
+    		  u_switch(p.ulen()), xdot(u), rho_dot(x_intp, J1),
+    		  u2Opt(x_intp, rho_intp, alpha),
+    		  dJdlam( x_intp, rho_intp, u2Opt ),
+    		  cntrlCost( u2Opt, dJdlam ),
+    		  J1(x_intp, xdesFnptr, m_mxdes_tf),
+    		  t_i(p.T()), t_f(p.T()), tf(p.T()), 
+    		  x_intp(x_vec , times, p.xlen()),
+    		  rho_intp(rho_vec , rho_times, p.xlen()),
+    		  x0noU(p.xlen()), u(p.ulen()), u2Search(p.u2search()),
+                  max_its(4), m_mxdes_tf( Eigen::MatrixXd::Zero(p.xlen(),1)) 
+    { }
     //]
     
     inline virtual void SimInitXRho( double &t0, const state_type &x0, 
@@ -126,13 +127,14 @@ namespace sac {
       
       //[ TESTING
       // if ( Jn > J0 ) { // cost increased so don't apply control
-      // 	xinit = x0noU;    // return x
-      // 	u_switch[0]=0;    // return default u1
-      // 	t_i=t0+calc_tm; t_curr[1]=t_i; 
+      // 	x = x0noU;    // return x
+      // 	// return default u1
+      // 	for (size_t i=0; i<u_switch.size(); i++ ) { u_switch[i]=0; }
+      // 	t_i=t0+calc_tm; t_app=t_i; 
       // 	t_f=t_i+ts; // return time horizon
       // }
       // else { 
-      // 	x_intp( t0+ts, xinit );
+      // 	x_intp( t0+ts, x );
       // 	// return time horizon {t_i, t_app, t_f}
       // }
       //]

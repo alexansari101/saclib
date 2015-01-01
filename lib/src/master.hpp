@@ -25,12 +25,6 @@
 namespace sac {
 
   /*********************************************/
-  /* Weightin Matrices */
-  Eigen::MatrixXd Q(xlen,xlen);
-  Eigen::MatrixXd R(ulen,ulen);
-  Eigen::MatrixXd P(xlen,xlen);
-
-  /*********************************************/
   /* The type of container used to hold the state vector */
   typedef std::vector< double > state_type;
   typedef std::vector< double >::iterator iter_1d;
@@ -101,6 +95,32 @@ namespace sac {
   */
   //]
 }
+
+
+/*********************************************/
+/* References to SAC Parameters */
+#include <params.hpp>          // SAC parameters
+namespace sac {
+  Params params(4,1);
+  /**/
+  double & T = params.T();
+  double & lam = params.lam(); 
+  double & maxdt = params.maxdt();
+  double & ts = params.ts(); 
+  std::vector< std::vector<double> > & usat = params.usat();
+  double & calc_tm = params.calc_tm();
+  bool & u2Search = params.u2search();
+  
+  size_t xlen = params.xlen(); 
+  size_t ulen = params.ulen();
+
+  /* Weightin Matrices */
+  Eigen::MatrixXd & Q = params.Q();
+  Eigen::MatrixXd & R = params.R();
+  Eigen::MatrixXd & P = params.P();
+  /**/
+}
+
 
 /*********************************************/
 /* Class declarations */
