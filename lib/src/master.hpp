@@ -29,6 +29,17 @@ namespace sac {
   typedef std::vector< double > state_type;
   typedef std::vector< double >::iterator iter_1d;
   typedef std::vector< state_type >::iterator iter_2d;
+#ifndef CONST_MAT
+  typedef Eigen::MatrixXd mat_type;
+  typedef Eigen::MatrixXd vec_type;
+#endif
+#ifdef CONST_MAT
+  /* Reserve state dimensions if known at compile time for speed */
+  typedef Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic, 
+  			 0, CONST_MAT, CONST_MAT  > mat_type;
+  typedef Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic, 
+  			 0, CONST_MAT, CONST_MAT  > vec_type;
+#endif
 
   /*********************************************/
   /* Function Prototypes */
@@ -47,7 +58,7 @@ namespace sac {
   class sys_dynam; class adjoint;
   size_t simX( sys_dynam& xdot, state_type& x0, double t0, double tf,
 	       std::vector<state_type>& x_vec, std::vector<double>& times );
-  size_t simRho( adjoint& rho_dot, state_type& rho_Tf, double& t0, double& tf, 
+  size_t simRho( adjoint& rho_dot, state_type& rho_Tf, double t0, double tf, 
 		 std::vector<state_type>& rho_vec,std::vector<double>& rho_times);
   template <typename T> int sgn(T val);
 
@@ -98,33 +109,9 @@ namespace sac {
 
 
 /*********************************************/
-/* References to SAC Parameters */
-#include <params.hpp>          // SAC parameters
-namespace sac {
-  Params params(4,1);
-  /**/
-  double & T = params.T();
-  double & lam = params.lam(); 
-  double & maxdt = params.maxdt();
-  double & ts = params.ts(); 
-  std::vector< std::vector<double> > & usat = params.usat();
-  double & calc_tm = params.calc_tm();
-  bool & u2Search = params.u2search();
-  
-  size_t xlen = params.xlen(); 
-  size_t ulen = params.ulen();
-
-  /* Weightin Matrices */
-  Eigen::MatrixXd & Q = params.Q();
-  Eigen::MatrixXd & R = params.R();
-  Eigen::MatrixXd & P = params.P();
-  /**/
-}
-
-
-/*********************************************/
 /* Class declarations */
 /* Includes */
+#include <params.hpp>          // SAC parameters
 #include <b_control.hpp>
 #include <state_intp.hpp>
 #include <sys_dynam.hpp>       // USER SPECIFIED
@@ -332,9 +319,9 @@ namespace sac {
     \param[out] rho_times The vector of times resulting from integration.
     \return The number of integration steps.
   */
-  size_t simRho( adjoint& rho_dot, state_type& rho_Tf, double& t0, double& tf, 
-		 std::vector<state_type>& rho_vec,std::vector<double>& rho_times)
-  {
+  size_t simRho( adjoint& rho_dot, state_type& rho_Tf, double t0, double tf, 
+		 std::vector<state_type>& rho_vec,
+		 std::vector<double>& rho_times) {
     using namespace std;
     using namespace boost::numeric::odeint;
     typedef runge_kutta_dopri5< state_type > stepper_type;

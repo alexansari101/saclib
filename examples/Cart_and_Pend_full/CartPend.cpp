@@ -2,69 +2,77 @@
  Full state cart pendulum system under acceleration control
  */
 
-#include "CartPend.hpp"
+/******************************************************************/
+/* Reserve max matrix NxN dims if known at compile time for speed */
+/* Must at least be the max(x_len,u_len).                         */
+// #define CONST_MAT 4
 
+#include <iostream>
+#include <master.hpp>               // Master include file
 #include <boost/timer/timer.hpp>    // timing stuff 
 #include <traj_cost.hpp>            // Add to compute final trajectory cost
 
 using namespace sac;
 
-void output( std::vector<state_type>& states, std::vector<double>& times );
+inline void state_proj( state_type & x );  // required by traj_cost class
+inline void get_DesTraj( const double t, const state_type &x,
+			 vec_type &m_mxdes );
 
 int main(int /* argc */ , char** /* argv */ )
 {
     using namespace std;
-    using namespace sac::init;
 
     boost::timer::auto_cpu_timer t(4, "%w seconds\n");
 
-    /* initialization */
-    // Params params(4,1);
-    params.T() = 0.28;
-    params.lam() = -10;
+    /* initialize SAC parameters */
+    Params params(4,1);
+    params.T() = 1.2;
+    params.lam() = -5;
     params.maxdt() = 0.2;
-    params.ts() = 0.001;
-    params.usat() = { {25, -25} };
-    params.calc_tm() = ts;
-    params.u2search() = false;
-    params.Q() = Eigen::Matrix<double, 4,4>::Zero(4,4);
-    params.P() = Eigen::Matrix<double, 4,4>::Zero(4,4);
-    params.P()(0,0) = 500;
+    params.ts() = 0.0167;
+    params.usat() = { {10, -10} };
+    params.calc_tm() = 0; // params.ts();
+    params.u2search() = true;
+    params.Q() = mat_type::Zero(4,4);
+    params.P() = mat_type::Zero(4,4);
+    params.Q()(0,0) = 200; params.Q()(2,2) = 100; params.Q()(3,3) = 50;
     params.R() << 0.3;
+
+    /* initialize SAC stepper */
+    sac_step SACit( params, get_DesTraj );
 
     /* simulation start/stop times */
     double t0=0.0, tsim = 10;
     
     /* initial state and control */
-    state_type x0(xlen), u_default(ulen);
-    x0 = { PI, 0, 0, 0 };  t_curr = { 0.0, 0.0, params.calc_tm() };
-    u_switch = { 0 };
+    state_type x0(params.xlen());    x0 = { PI, 0, 0, 0 };
+    b_control u1(params);     u1.stimes( 0, params.calc_tm() );
 
     /* compute final trajectory cost */
+    vector<state_type> x_out, u2list, TiTappTf;
     vector<double> state_times;
-    state_intp traj_intp(x_out, state_times, xlen);
+    state_intp traj_intp(x_out, state_times, params.xlen());
     traj_cost J_traj( traj_intp, state_proj, u2list, TiTappTf, 
-		      get_DesTraj, SACit.m_mxdes_tf );
-    J_traj.Q() = 0*J_traj.Q();
-    J_traj.Q()(0,0) = 1000;  J_traj.Q()(1,1) = 10;
-    J_traj.P() = 0*J_traj.P();
+		      get_DesTraj, SACit.m_mxdes_tf, params );
+    //
+    J_traj.Q() = params.Q(); J_traj.P() = params.P();
     J_traj.R() << 0.3;
     //]
     
     /* Save initial x and u */
     x_out.push_back(x0); state_times.push_back(t0);
-    u2list.push_back(u_default); TiTappTf.push_back( t_curr );
+    u2list.push_back( u1.m_u_switch ); 
+    TiTappTf.push_back( { u1.m_tau1, 0.0, u1.m_tau2 } );
 
     while ( t0 < tsim ) {
       
       /* Perform SAC step */
-      std::vector<double> rvec = sac_stepper(x0, u_switch, t0);
-      
-      /* Save initial x and u */
-      x_out.push_back(x0); state_times.push_back(t0);
-      u2list.push_back( u_switch ); TiTappTf.push_back( t_curr );
+      SACit( t0, x0, u1 ); // update: u1 and x0 to time t0+ts
 
-      t0 = t0+ts;
+      /* Save updated x and u */
+      x_out.push_back(x0); state_times.push_back(t0);
+      u2list.push_back( u1.m_u_switch ); 
+      TiTappTf.push_back( { SACit.t_i, SACit.t_app, SACit.t_f } );
 
     } /* end main while() loop */
 
@@ -83,15 +91,17 @@ int main(int /* argc */ , char** /* argv */ )
 }
 
 
+/*******************************************
+   Projection for calculations involving x(t) */
+inline void state_proj( state_type & x ) {
+  AngleWrap( x[0] );
+}
+
 
 /*******************************************
-   output( rho_vec, rho_times );
-   cout << "rho steps: " << steps << endl; */
-void output( std::vector<state_type>& states, std::vector<double>& times ) {
-  using namespace std;
-
-  for( size_t i=0; i<times.size(); i++ )
-  {
-      cout << times[i] << '\t' << states[i][0] << '\t' << states[i][1] << '\n';
-  }
+   outputs a point in the desired trajectory at time t */
+inline void get_DesTraj( const double /*t*/,
+			 const state_type &/*x*/,
+			 vec_type &m_mxdes ) {
+  m_mxdes << 0, 0, 0, 0;
 }

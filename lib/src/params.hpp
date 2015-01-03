@@ -17,9 +17,9 @@ namespace sac {
     double calc_tm_;      //! time assumed for SAC calcs
     bool u2search_;       //! search for best time to apply control?
     /* cost parameters */
-    Eigen::MatrixXd mQ_;  //! incremental quadratic state cost weights 
-    Eigen::MatrixXd mP1_; //! terminal quadratic cost weights
-    Eigen::MatrixXd mR_;  //! incremental quadratic control cost weights
+    mat_type mQ_;  //! incremental quadratic state cost weights 
+    mat_type mP1_; //! terminal quadratic cost weights
+    mat_type mR_;  //! incremental quadratic control cost weights
   public:
     /*!
       Constructor for Params class to hold SAC parameters.
@@ -98,22 +98,22 @@ namespace sac {
     bool & u2search() { return u2search_; }
 
     /*!
-      get using:      Eigen::MatrixXd rQ = J_traj.Q();
-      get ref using:  Eigen::MatrixXd & rQ = J_traj.Q();
+      get using:      mat_type rQ = J_traj.Q();
+      get ref using:  mat_type & rQ = J_traj.Q();
       set using:      param.Q() << 1000, 0, 0, 10;
       \return A reference to the mQ_ weight matrix for both getting and setting
     */
-    Eigen::MatrixXd & Q( ) { return mQ_; }
+    mat_type & Q( ) { return mQ_; }
 
     /*!
       \return A reference to the mP1_ weight matrix for both getting and setting
     */
-    Eigen::MatrixXd & P( ) { return mP1_; }
+    mat_type & P( ) { return mP1_; }
 
     /*!
       \return A reference to the mR_ weight matrix for both getting and setting
     */
-    Eigen::MatrixXd & R( ) { return mR_; }
+    mat_type & R( ) { return mR_; }
     
   };
   //]

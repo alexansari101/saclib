@@ -18,7 +18,7 @@ namespace sac {
     b_control u1_, u2_;
     sys_dynam xdot1_, xdot2_;
     state_type dxdt1_, dxdt2_;
-    Eigen::MatrixXd mrho_curr_, mxdot1_ , mxdot2_;
+    vec_type mrho_curr_, mxdot1_ , mxdot2_;
   
   public:
     //! \todo Alex: make inputs const ref type
@@ -27,18 +27,20 @@ namespace sac {
       \param[in] x_intp User maintained state interpolation object
       \param[in] rho_intp User maintained co-state interpolation object
       \param[in] u2Opt User maintained \f$u_2^*(t)\f$ object
+      \param[in] p SAC parameters
     */
     mode_insert_grad( state_intp & x_intp, state_intp & rho_intp,
-		      u2_optimal & u2Opt ) : rx_intp_( x_intp ) ,
-					     rrho_intp_( rho_intp ) , 
-					     u2Opt_(u2Opt) , x_curr_(xlen) , 
-					     rho_curr_(xlen) , u2_curr_(ulen) ,
-					     u1_(ulen) , u2_(ulen) ,
-					     xdot1_(u1_) , xdot2_(u2_) , 
-					     dxdt1_(xlen) ,  dxdt2_(xlen),
-					     mrho_curr_(xlen,1), 
-					     mxdot1_(xlen,1) ,
-					     mxdot2_(xlen,1) { }
+		      u2_optimal & u2Opt, Params & p ) 
+      : rx_intp_( x_intp ) ,
+	rrho_intp_( rho_intp ) , 
+	u2Opt_(u2Opt) , x_curr_(p.xlen()) , 
+	rho_curr_(p.xlen()) , u2_curr_(p.ulen()) ,
+	u1_(p) , u2_(p) ,
+	xdot1_(u1_) , xdot2_(u2_) , 
+	dxdt1_(p.xlen()) ,  dxdt2_(p.xlen()),
+	mrho_curr_(p.xlen(),1), 
+	mxdot1_(p.xlen(),1) ,
+	mxdot2_(p.xlen(),1) { }
   
     /*!
       Computes the value of the mode insertion gradient, \f$\frac{dJ1}

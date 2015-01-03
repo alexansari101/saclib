@@ -11,14 +11,15 @@ namespace sac {
     accounted for.
   */
   class inc_cost {
-    Eigen::MatrixXd mx_;
+    vec_type mx_;
     void (*p_get_DesTraj)( const double t, const state_type &x,
-			   Eigen::MatrixXd &mxdes ); // desired trajectory
+			   vec_type &mxdes ); // desired trajectory
+    Params & p_;
   
   public:
     state_intp & m_x_intp; // store current state
     state_type m_x;
-    Eigen::MatrixXd m_mxdes;
+    vec_type m_mxdes;
   
     //! \todo Alex: make inputs const ref type
     /*!
@@ -26,14 +27,16 @@ namespace sac {
       to the desired trajectory.
       \param[in] x_intp User maintained state interpolation object
       \param[in] xdesFnptr Pointer to the desired trajectory
+      \param[in] p SAC parameters
     */
     inc_cost( state_intp & x_intp,
 	      void (* xdesFnptr) ( const double t, const state_type &x
-				   Eigen::MatrixXd &mxdes ) 
-	      ): mx_(Eigen::MatrixXd::Zero(xlen,1)), 
-		 p_get_DesTraj( xdesFnptr ),
-		 m_x_intp( x_intp ), m_x( xlen ),
-		 m_mxdes(Eigen::MatrixXd::Zero(xlen,1)) { }
+				   vec_type &mxdes ),
+	      Params & p
+	      ): mx_(vec_type::Zero(p.xlen(),1)), 
+		 p_get_DesTraj( xdesFnptr ), p_(p),
+		 m_x_intp( x_intp ), m_x( p.xlen() ),
+		 m_mxdes(vec_type::Zero(p.xlen(),1)) { }
   
     /*!
       Computes the value of incremental trajectory tracking cost, \f$l(x)\f$.
@@ -48,7 +51,7 @@ namespace sac {
       //
       p_get_DesTraj( t, m_x, m_mxdes ); // Get desired trajectory point
       //
-      dJdt[0] = ( ( (mx_-m_mxdes).transpose() * Q 
+      dJdt[0] = ( ( (mx_-m_mxdes).transpose() * p_.Q() 
 		    * (mx_-m_mxdes) ) / 2.0 )(0);
     }
 
@@ -59,12 +62,12 @@ namespace sac {
       \param[in] mx The current state
       \param[out] dldx The derivative \f$D_x l(x)\f$.
     */
-    inline void dx( const double t, const Eigen::MatrixXd &mx,
-		    Eigen::MatrixXd &dldx ) { 
+    inline void dx( const double t, const vec_type &mx,
+		    mat_type &dldx ) { 
       Mat2State( mx, m_x);
       p_get_DesTraj( t, m_x, m_mxdes ); // Get desired trajectory point
       //
-      dldx = (mx-m_mxdes).transpose()*Q;
+      dldx = (mx-m_mxdes).transpose()*p_.Q();
     }
 
     /*!

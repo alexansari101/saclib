@@ -13,8 +13,9 @@ namespace sac {
     state_type J1_, x_tf_;  // init w/ terminal cost then holds current cost
     double t0_, tf_;
     size_t J1steps_;
-    Eigen::MatrixXd mx_tf_;
-    Eigen::MatrixXd & mxdes_tf_;
+    vec_type mx_tf_;
+    vec_type & mxdes_tf_;
+    Params & p_;
   
   public:
     inc_cost m_lofx;          // incremental trajectory cost
@@ -26,14 +27,16 @@ namespace sac {
       state trajectory.
       \param[in] x_intp state interpolation object
       \param[in] xdesFnptr Pointer to a function that evaluates \f$x_{des}(t)\f$.
+      \param[in] p SAC parameters
     */
     cost( state_intp & x_intp,
 	  void (*xdesFnptr) ( const double t, const state_type &x,
-			      Eigen::MatrixXd &m_mxdes ),
-	  Eigen::MatrixXd & mxdes_tf 
-	  ) : J1_(1), x_tf_( xlen ), t0_( 0.0 ), tf_( 0.0 ), 
-	      J1steps_(0), mx_tf_(xlen,1), mxdes_tf_( mxdes_tf ),
-	      m_lofx( x_intp, xdesFnptr ), m_x_intp( x_intp ) { }
+			      vec_type &m_mxdes ),
+	  vec_type & mxdes_tf,
+	  Params & p
+	  ) : J1_(1), x_tf_( p.xlen() ), t0_( 0.0 ), tf_( 0.0 ), 
+	      J1steps_(0), mx_tf_(p.xlen(),1), mxdes_tf_( mxdes_tf ), p_(p),
+	      m_lofx( x_intp, xdesFnptr, p ), m_x_intp( x_intp ) { }
 
     /*! 
       Get the cost at the terminal time, \f$m(x(t_f))\f$.
@@ -45,7 +48,7 @@ namespace sac {
       tf_ = m_lofx.end();
       m_x_intp( tf_, x_tf_ );
       State2Mat( x_tf_, mx_tf_ );
-      return ((mx_tf_-mxdes_tf_).transpose()*P*(mx_tf_-mxdes_tf_))(0);
+      return ((mx_tf_-mxdes_tf_).transpose()*p_.P()*(mx_tf_-mxdes_tf_))(0);
     }
   
     /*! 
@@ -53,12 +56,12 @@ namespace sac {
       \return \f$(x(t_f)-x_{des}(t_f))^T\;P_1\f$, which is \f$D_x m(x(t_f))\f$
       assuming a quadratic form for the terimal cost.
     */
-    inline Eigen::MatrixXd get_dmdx( ) { 
+    inline mat_type get_dmdx( ) { 
       t0_ = m_lofx.begin();
       tf_ = m_lofx.end();
       m_x_intp( tf_, x_tf_ );
       State2Mat( x_tf_, mx_tf_ );
-      return (mx_tf_-mxdes_tf_).transpose()*P;
+      return (mx_tf_-mxdes_tf_).transpose()*p_.P();
     }
   
     /*!

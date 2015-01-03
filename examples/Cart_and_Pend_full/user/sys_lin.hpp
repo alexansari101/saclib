@@ -10,10 +10,10 @@ namespace sac {
     double h_;
   
   public:
-    sys_lin( ) :  g_(9.81), h_(2) {  }
+    sys_lin( ) :  g_(9.81), h_(1) {  }
 
     void A( const state_type & x, const state_type & u, 
-	    Eigen::MatrixXd & Amat ) {
+	    mat_type & Amat ) {
       Amat << 0, 1, 0, 0,
 	( g_*cos(x[0]) - u[0]*sin(x[0]) ) / h_ ,  0, 0, 0,
 	0, 0, 0, 1,
@@ -21,7 +21,7 @@ namespace sac {
     }
 
     void B( const state_type & x, const state_type & /*u*/, 
-	    Eigen::MatrixXd & Bmat ) {
+	    mat_type & Bmat ) {
       Bmat << 0, cos(x[0]) / h_, 0, 1;
     }
   };

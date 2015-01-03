@@ -11,11 +11,11 @@ namespace sac {
     state_intp & rx_intp_;
     void (*p_state_Proj) ( state_type & x );      // pointer to function to project state
     void (*p_get_DesTraj)( const double t, const state_type &x,
-			   Eigen::MatrixXd &mxdes ); // desired trajectory
-    Eigen::MatrixXd mxdes_;
-    Eigen::MatrixXd & rmQ_;
+			   vec_type &mxdes ); // desired trajectory
+    vec_type mxdes_;
+    mat_type & rmQ_;
     state_type x_;
-    Eigen::MatrixXd mx_;
+    vec_type mx_;
 
   public:
 
@@ -27,19 +27,21 @@ namespace sac {
       angle wrapping (etc) before it is used in calcs
       \param[in] xdesFnptr Pointer to a function that evaluates \f$x_{des}(t)\f$
       \param[in] rmQ  Weight matrix defining norm on incremental state tracking error
+      \param[in] p SAC parameters
     */
     inc_state_cost( state_intp & rx_intp,
 		    void (*xProjFnptr) ( state_type & x ),
 		    void (*xdesFnptr) ( const double t, const state_type &x,
-					Eigen::MatrixXd &mxdes ),
-		    Eigen::MatrixXd & rmQ
+					vec_type &mxdes ),
+		    mat_type & rmQ,
+		    Params & p
 		    ) : rx_intp_( rx_intp ),		      
 			p_state_Proj( xProjFnptr ),
 			p_get_DesTraj( xdesFnptr ), 
-			mxdes_( Eigen::MatrixXd::Zero(xlen,1) ),
+			mxdes_( vec_type::Zero(p.xlen(),1) ),
 			rmQ_( rmQ ),
-			x_(xlen),
-			mx_( Eigen::MatrixXd::Zero(xlen,1) ) { }
+			x_(p.xlen()),
+			mx_( vec_type::Zero(p.xlen(),1) ) { }
 
 
     /*!
@@ -79,13 +81,13 @@ namespace sac {
     state_intp & rx_intp_;
     void (*p_state_Proj) ( state_type & x );      // pointer to function to project state
     std::vector<state_type> & ru2list_, & rTiTappTf_;
-    const Eigen::MatrixXd & rmxdes_tf_;
-    Eigen::MatrixXd mQ_;
-    Eigen::MatrixXd mP1_;
-    Eigen::MatrixXd mR_;
+    const vec_type & rmxdes_tf_;
+    mat_type mQ_;
+    mat_type mP1_;
+    mat_type mR_;
     state_type x_, cost_;
-    Eigen::MatrixXd mx_;
-    Eigen::MatrixXd mu2_;
+    vec_type mx_;
+    vec_type mu2_;
     double integ_state_cost_, u2cost_, term_cost_;
     inc_state_cost inc_tracking_cost_;
 
@@ -102,30 +104,33 @@ namespace sac {
       \param[in] rTiTappTf Reference to list of application times for u2
       \param[in] xdesFnptr Pointer to a function that evaluates \f$x_{des}(t)\f$
       \param[in] rmxdes_tf Reference to \f$x_{des}(t_f)\f$
+      \param[in] p SAC parameters
     */
     traj_cost( state_intp & rx_intp,
 	       void (*xProjFnptr) ( state_type & x ),
 	       std::vector<state_type> & ru2list,
 	       std::vector<state_type> & rTiTappTf,
 	       void (*xdesFnptr) ( const double t, const state_type &x, 
-				   Eigen::MatrixXd &mxdes ),
-	       const Eigen::MatrixXd & rmxdes_tf
+				   vec_type &mxdes ),
+	       const vec_type & rmxdes_tf,
+	       Params & p
 	       ) : rx_intp_( rx_intp ),
 		   p_state_Proj( xProjFnptr ),
 		   ru2list_( ru2list ),
 		   rTiTappTf_( rTiTappTf ),
 		   rmxdes_tf_( rmxdes_tf ),
-		   mQ_( Eigen::MatrixXd::Identity(xlen,xlen) ),
-                   mP1_( Eigen::MatrixXd::Zero(xlen,xlen) ),
-                   mR_( Eigen::MatrixXd::Identity(ulen,ulen) ),
-                   x_(xlen),
+		   mQ_( mat_type::Identity(p.xlen(),p.xlen()) ),
+                   mP1_( mat_type::Zero(p.xlen(),p.xlen()) ),
+                   mR_( mat_type::Identity(p.ulen(),p.ulen()) ),
+                   x_(p.xlen()),
                    cost_(1),
-                   mx_( Eigen::MatrixXd::Zero(xlen,1) ),
-                   mu2_( Eigen::MatrixXd::Zero(ulen,1) ),
+                   mx_( vec_type::Zero(p.xlen(),1) ),
+                   mu2_( vec_type::Zero(p.ulen(),1) ),
                    integ_state_cost_(0.0), 
                    u2cost_(0.0),
                    term_cost_(0.0),
-                   inc_tracking_cost_( rx_intp, xProjFnptr, xdesFnptr, mQ_ ) { }
+                   inc_tracking_cost_( rx_intp, xProjFnptr, xdesFnptr, mQ_, p )
+    { }
 
   
     /*!
@@ -166,22 +171,22 @@ namespace sac {
     }
 
     /*!
-      get using:      Eigen::MatrixXd rQ = J_traj.Q();
-      get ref using:  Eigen::MatrixXd & rQ = J_traj.Q();
+      get using:      mat_type rQ = J_traj.Q();
+      get ref using:  mat_type & rQ = J_traj.Q();
       set using:      J_traj.Q() << 1000, 0, 0, 10;
       \return A reference to the mQ_ weight matrix for both getting and setting
     */
-    Eigen::MatrixXd & Q( ) { return mQ_; }
+    mat_type & Q( ) { return mQ_; }
 
     /*!
       \return A reference to the mP1_ weight matrix for both getting and setting
     */
-    Eigen::MatrixXd & P( ) { return mP1_; }
+    mat_type & P( ) { return mP1_; }
 
     /*!
       \return A reference to the mR_ weight matrix for both getting and setting
     */
-    Eigen::MatrixXd & R( ) { return mR_; }
+    mat_type & R( ) { return mR_; }
 
   };
   //]

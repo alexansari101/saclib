@@ -20,11 +20,12 @@ namespace sac {
     state_type rho_curr_;
     double & alpha_;
     state_type u1_;
-    Eigen::MatrixXd  mrslt_, mu1_;
-    Eigen::MatrixXd mx_curr_, mrho_curr_;
-    Eigen::MatrixXd B_;
+    vec_type  mrslt_, mu1_;
+    vec_type mx_curr_, mrho_curr_;
+    mat_type B_;
     sys_lin lin_;
     size_t i_;
+    Params & p_;
   
   public:
     //! \todo Alex: make inputs const ref type
@@ -36,23 +37,26 @@ namespace sac {
       \param[in] alpha User specified desired change in cost functional
       relative to the duration of activiation of \f$u_2^*(t)\f$. 
       i.e. \f$\frac{\Delta J_1}{\Delta t}\f$.
+      \param[in] p SAC parameters
     */
-    u2_optimal( state_intp & x_intp, 
-		state_intp & rho_intp, 
-		double & alpha ) : rx_intp_( x_intp ) ,
+    u2_optimal( state_intp & x_intp, state_intp & rho_intp, 
+		double & alpha, Params & p ) : rx_intp_( x_intp ) ,
 				   rrho_intp_( rho_intp ) ,
-				   x_curr_(xlen) , rho_curr_(xlen) , 
-				   alpha_( alpha ) , u1_(ulen),
-				   mrslt_(ulen,1), mu1_(ulen,1),
-				   mx_curr_(xlen,1), mrho_curr_(xlen,1),
-				   B_(xlen,ulen) { 
-      for ( i_=0; i_<ulen; i_++ ) {
+				   x_curr_(p.xlen()) , 
+				   rho_curr_(p.xlen()) , 
+				   alpha_( alpha ) , u1_(p.ulen()),
+				   mrslt_(p.ulen(),1), mu1_(p.ulen(),1),
+				   mx_curr_(p.xlen(),1), 
+				   mrho_curr_(p.xlen(),1),
+				   B_(p.xlen(),p.ulen()), p_(p) { 
+      for ( i_=0; i_<p.ulen(); i_++ ) {
 	u1_[i_] = 0.0;
 	mu1_(i_,0) = 0.0;
 	mrslt_(i_,0) = 0.0;
       }
     }
   
+    //! \todo Alex: incorporate u1
     /*!
       Computes the value of the optimal switching control,\f$u_2^*(t)\f$.
       \f[u_2^*(t) = \; (\Lambda + R)^{-1} \, [\Lambda \, u_1(t) + h(x(t))^T 
@@ -65,11 +69,12 @@ namespace sac {
       rrho_intp_(t, rho_curr_);  State2Mat( rho_curr_, mrho_curr_ );
       lin_.B( x_curr_, u1_, B_ );
       mrslt_ = B_.transpose()*mrho_curr_;
-      mrslt_ = ( mrslt_*mrslt_.transpose() + R ).inverse()
+      mrslt_ = ( mrslt_*mrslt_.transpose() + p_.R() ).inverse()
 	*(/* (...)*mu1_ +*/ mrslt_*alpha_);    
       //
-      for ( i_=0; i_<ulen; i_++ ) { u2Opt_curr[i_] = mrslt_(i_,0); }
+      for ( i_=0; i_<p_.ulen(); i_++ ) { u2Opt_curr[i_] = mrslt_(i_,0); }
     }
+
   };
 
 }

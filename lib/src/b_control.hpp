@@ -10,20 +10,21 @@ namespace sac {
   */
   class b_control {
     state_type u_default_;
+    Params * p_;
   public:
-    size_t m_len;
     double m_tau1, m_tau2;
     state_type m_u_switch;
   
     //! \todo Alex: Make constructor explicit if it takes single arg.
+    //! \todo Alex: Make constructor reference and pointer inputs const.
     /*!
       Constructor sets the nominal control to the zero vector.
-      \param[in] len The length of the control vector.
+      \param[in] p SAC parameters
     */
-    b_control( const size_t len ) : u_default_(len), m_len(len), 
+    b_control( Params & p ) : u_default_(p.ulen()), p_(&p), 
 				    m_tau1(0.0), m_tau2(0.0), 
-				    m_u_switch(len) { 
-      for ( size_t i=0; i<m_len; i++ ) {
+				    m_u_switch(p.ulen()) { 
+      for ( size_t i=0; i<p.ulen(); i++ ) {
 	u_default_[i] = 0.0;  // set default control to 0 vector
 	m_u_switch[i] = 0.0;
       }
@@ -48,10 +49,10 @@ namespace sac {
     */
     void operator= ( const state_type & u_switch ) { 
       double val;
-      for ( size_t i=0; i<m_len; i++ ) { // saturate controls
+      for ( size_t i=0; i<p_->ulen(); i++ ) { // saturate controls
 	val = u_switch[i];
-	if ( val > usat[i][0] ) { val = usat[i][0]; }
-	else if ( val < usat[i][1] ) { val = usat[i][1]; }
+	if ( val > p_->usat()[i][0] ) { val = p_->usat()[i][0]; }
+	else if ( val < p_->usat()[i][1] ) { val = p_->usat()[i][1]; }
 	m_u_switch[i] = val;
       }
     }
@@ -77,7 +78,7 @@ namespace sac {
       \f$\tau_1\f$ and \f$\tau_2\f$ to 0.
     */
     void clear( ) {
-      for ( size_t i=0; i<m_len; i++ ) {
+      for ( size_t i=0; i<p_->ulen(); i++ ) {
 	m_u_switch[i] = 0.0;
       }
       m_tau1 = 0.0;    m_tau2 = m_tau1;

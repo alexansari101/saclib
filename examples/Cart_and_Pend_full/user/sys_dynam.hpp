@@ -12,7 +12,8 @@ namespace sac {
     state_type u_curr_;
   
   public:
-    sys_dynam( b_control & u ) : g_(9.81), h_(2), u_(u), u_curr_(ulen) { }
+    sys_dynam( b_control & u ) : g_(9.81), h_(1), u_(u), 
+				 u_curr_(1) { }
   
     void operator() (const state_type &x, state_type &dxdt, const double t)
     {
