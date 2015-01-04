@@ -14,7 +14,6 @@ namespace sac {
     double t0_, tf_;
     size_t J1steps_;
     vec_type mx_tf_;
-    vec_type & mxdes_tf_;
     Params & p_;
   
   public:
@@ -26,17 +25,12 @@ namespace sac {
       Constructs a cost object from a state interpolation object and desired
       state trajectory.
       \param[in] x_intp state interpolation object
-      \param[in] xdesFnptr Pointer to a function that evaluates \f$x_{des}(t)\f$.
       \param[in] p SAC parameters
     */
-    cost( state_intp & x_intp,
-	  void (*xdesFnptr) ( const double t, const state_type &x,
-			      vec_type &m_mxdes ),
-	  vec_type & mxdes_tf,
-	  Params & p
-	  ) : J1_(1), x_tf_( p.xlen() ), t0_( 0.0 ), tf_( 0.0 ), 
-	      J1steps_(0), mx_tf_(p.xlen(),1), mxdes_tf_( mxdes_tf ), p_(p),
-	      m_lofx( x_intp, xdesFnptr, p ), m_x_intp( x_intp ) { }
+    cost( state_intp & x_intp, Params & p ) 
+      : J1_(1), x_tf_( p.xlen() ), t0_( 0.0 ), tf_( 0.0 ), 
+	J1steps_(0), mx_tf_(p.xlen(),1), p_(p), 
+	m_lofx( x_intp, p ), m_x_intp( x_intp ) { }
 
     /*! 
       Get the cost at the terminal time, \f$m(x(t_f))\f$.
@@ -47,8 +41,10 @@ namespace sac {
       t0_ = m_lofx.begin();
       tf_ = m_lofx.end();
       m_x_intp( tf_, x_tf_ );
+      p_.proj( x_tf_ );
       State2Mat( x_tf_, mx_tf_ );
-      return ((mx_tf_-mxdes_tf_).transpose()*p_.P()*(mx_tf_-mxdes_tf_))(0);
+      return ( ( (mx_tf_-p_.mxdes_tf()).transpose() * p_.P() 
+		 * (mx_tf_-p_.mxdes_tf()) )/ 2.0)(0);
     }
   
     /*! 
@@ -61,7 +57,7 @@ namespace sac {
       tf_ = m_lofx.end();
       m_x_intp( tf_, x_tf_ );
       State2Mat( x_tf_, mx_tf_ );
-      return (mx_tf_-mxdes_tf_).transpose()*p_.P();
+      return (mx_tf_-p_.mxdes_tf()).transpose()*p_.P();
     }
   
     /*!
@@ -107,7 +103,8 @@ namespace sac {
     typedef runge_kutta_dopri5< state_type > stepper_type;
     
     double eps = 1E-7;
-    size_t J1_steps = integrate_adaptive( make_controlled( 1E-5 , 1E-5 , 
+    size_t J1_steps = integrate_adaptive( make_controlled( p_.eps_cost( ) , 
+							   p_.eps_cost( ) , 
 							   stepper_type( ) ) , 
 					  m_lofx , term_cost , t0_ , tf_-eps , 0.01 );
 

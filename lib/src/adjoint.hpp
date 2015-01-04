@@ -16,6 +16,7 @@ namespace sac {
     mat_type mdldx_;
     mat_type mdfdx_;
     size_t indx_;
+    Params & p_;
 
   public:
     state_intp & m_x_intp;
@@ -36,7 +37,7 @@ namespace sac {
 			     rho_(p.xlen()), mx_(p.xlen(),1),
 			     mrho_(p.xlen(),1), mrhodot_(p.xlen(),1),
 			     mdldx_(1,p.xlen()), mdfdx_(p.xlen(),p.xlen()),
-			     m_x_intp( x_intp ),
+			     p_(p), m_x_intp( x_intp ),
 			     m_lofx(J.m_lofx) {  
       for ( size_t i=0; i<p.ulen(); i++ ) { u1_[i] = 0.0; } 
     }
@@ -53,10 +54,13 @@ namespace sac {
     {
       rho_ = rho;
       m_x_intp(t, x_);        // store the current state in x
-      State2Mat( x_, mx_ );   // convert state to matrix form
-      State2Mat( rho_, mrho_ );
       //
       m_lin.A( x_, u1_, mdfdx_ );
+      //
+      p_.proj( x_ );  //! \todo Alex: decide if this should go before lin.A()
+      //
+      State2Mat( x_, mx_ );   // convert state to matrix form
+      State2Mat( rho_, mrho_ );
       //
       m_lofx.dx( t, mx_, mdldx_ );
       //

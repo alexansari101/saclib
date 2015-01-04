@@ -3,18 +3,18 @@
 
 namespace sac {
 
-  //[ The class to carry out a sac control step
+  //! The class to carry out a sac control step
   class sac_step {
   protected:
     /* protected initialization */
-    double alpha, min_val, dtt_win, dt_win;
-    state_type x, rho;  state_type u_curr;  
-    sys_dynam xdot;  adjoint rho_dot;
-    vec_type m_mrho_tf;
-    u2_optimal u2Opt;  mode_insert_grad dJdlam;
-    double dJdlam_curr;   u2_cost cntrlCost;
-    std::vector<double> lclMin;
-    cost J1;  iter_1d it1_1d;   size_t j, steps;
+    double alpha_, min_val_, dtt_win_, dt_win_;
+    state_type x_, rho_;  state_type u_curr_;  
+    sys_dynam xdot_;  adjoint rho_dot_;
+    vec_type m_mrho_tf_;
+    u2_optimal u2Opt_;  mode_insert_grad dJdlam_;
+    double dJdlam_curr_;   u2_cost cntrlCost_;
+    std::vector<double> lclMin_;
+    cost J1_;  iter_1d it1_1d_;   size_t j_, steps_;
     Params & p_;
 
     inline virtual void SimInitXRho( const double &t0, const state_type &x0, 
@@ -30,24 +30,20 @@ namespace sac {
     state_type x0noU;   b_control u;
     std::vector<state_type> x_vec, rho_vec;    
     std::vector<double> times, rho_times;
-    bool u2Search;  size_t its, max_its;
-    vec_type m_mxdes_tf;
+    size_t its;
     
-    sac_step( Params & p, 
-    	      void (*xdesFnptr) ( const double t, const state_type &x,
-    				  vec_type &m_mxdes )
-    	      ) : dt_win(p.maxdt()/2.0), x(p.xlen()), rho(p.xlen()), 
-    		  u_curr(p.ulen()), xdot(u), rho_dot(x_intp, J1, p),
-    		  m_mrho_tf( p.xlen(), 1 ),
-		  u2Opt( x_intp, rho_intp, alpha, p ),
-    		  dJdlam( x_intp, rho_intp, u2Opt, p ),
-    		  cntrlCost( u2Opt, dJdlam, p ),
-    		  J1(x_intp, xdesFnptr, m_mxdes_tf, p), p_(p),
-    		  t_i(p.T()), t_f(p.T()), tf(p.T()), 
-    		  x_intp(x_vec , times, p.xlen()),
-    		  rho_intp(rho_vec , rho_times, p.xlen()),
-    		  x0noU(p.xlen()), u(p), u2Search(p.u2search()),
-                  max_its(4), m_mxdes_tf( vec_type::Zero(p.xlen(),1)) 
+    sac_step( Params & p ) 
+      : dt_win_(p.maxdt()/2.0), x_(p.xlen()), rho_(p.xlen()), 
+	u_curr_(p.ulen()), xdot_(u), rho_dot_(x_intp, J1_, p),
+	m_mrho_tf_( p.xlen(), 1 ),
+	u2Opt_( x_intp, rho_intp, alpha_, p ),
+	dJdlam_( x_intp, rho_intp, u2Opt_, p ),
+	cntrlCost_( u2Opt_, dJdlam_, p ),
+	J1_(x_intp, p), p_(p),
+	t_i(p.T()), t_f(p.T()), tf(p.T()), 
+	x_intp(x_vec , times, p.xlen()),
+	rho_intp(rho_vec , rho_times, p.xlen()),
+	x0noU(p.xlen()), u(p)
     { }
 
     /*!
@@ -70,36 +66,37 @@ namespace sac {
       SimInitXRho( t0, x0, u1 );
 
       /* Initialize Cost, timestep, & iters before applying u2 */
-      J1.update( );
-      J0 = J1;             Jn = J0;
-      dtt_win = dt_win;    its = 0;
+      J1_.update( );
+      J0 = J1_;             Jn = J0;
+      dtt_win_ = dt_win_;    its = 0;
 
       /* Set alpha based on the initial cost */
-      alpha = p_.lam()*J0;
+      alpha_ = p_.lam()*J0;
 
       /* u2 automatically computed from x_intp - find opt time to apply */
-      if ( u2Search ) { lclMin.clear();
-	MinSearch( cntrlCost, t0+p_.calc_tm(), tf, lclMin, 0.006, 1E-3 ); 
-	it1_1d = get_min(lclMin.begin(), lclMin.end(), cntrlCost, min_val);
-	t_app = *it1_1d; /* OR: */ } else { t_app = t0+p_.calc_tm(); }
+      if ( p_.u2search() ) { lclMin_.clear();
+	MinSearch( cntrlCost_, t0+p_.calc_tm(), tf, lclMin_, 0.006, 1E-3 ); 
+	it1_1d_=get_min(lclMin_.begin(), lclMin_.end(), cntrlCost_, min_val_);
+	t_app = *it1_1d_; /* OR: */ } else { t_app = t0+p_.calc_tm(); }
     
-      u2Opt( t_app, u_curr );    dJdlam( t_app, dJdlam_curr );
+      u2Opt_( t_app, u_curr_ );    dJdlam_( t_app, dJdlam_curr_ );
     
-      t_i = (t_app-dtt_win); t_f = (t_app+dtt_win);
+      t_i = (t_app-dtt_win_); t_f = (t_app+dtt_win_);
       if ( t_i < t0+p_.calc_tm() ) { t_i = t0+p_.calc_tm(); }   
       if ( t_f > tf ) { t_f = tf; }   if ( t_f < t_i ) { t_i = t_f; }
       //
-      else if ( dJdlam_curr < 0 ) {  // use control only if dJdlam < 0
+      else if ( dJdlam_curr_ < 0 ) {  // use control only if dJdlam < 0
 	/* Simulate X based on applying u2* at optimal time */
 	SimNewX( t0, x0, u1 );
       
 	/* Update Cost after applying u2* */
-	J1.update();	Jn = J1;
+	J1_.update();	Jn = J1_;
 
 	/* Backtrack until cost is improved by desired amount or its */
-	while ( ( (Jn>J0) || (std::abs(Jn-J0)<0.01*J0) ) && (its<max_its) ) {
-	  dtt_win = dtt_win/2.0;
-	  t_i = (t_app-dtt_win); t_f = (t_app+dtt_win);
+	while ( ( (Jn>J0) || (std::abs(Jn-J0)<0.01*J0) ) 
+		&& (its<p_.backtrack_its()) ) {
+	  dtt_win_ = dtt_win_/2.0;
+	  t_i = (t_app-dtt_win_); t_f = (t_app+dtt_win_);
 	  if ( t_i < t0+p_.calc_tm() ) { t_i = t0+p_.calc_tm(); }  
 	  if ( t_f > tf ) { t_f=tf; } if ( t_i>=t_f ) { t_i=t_f; break; }
 	  else {  
@@ -107,7 +104,7 @@ namespace sac {
 	    SimNewX( t0, x0, u1 );
       
 	    /* Update Cost after applying u2* */
-	    J1.update();      Jn = J1;	  
+	    J1_.update();      Jn = J1_;	  
 	  } /* end else */
 	  its++;
 	} /* end backtracking while */
@@ -126,7 +123,7 @@ namespace sac {
       else { 
       	x_intp( t0+p_.ts(), x0 ); // return updated state
 	// return new control with new horizon {t_i, t_app, t_f}
-	u1=u_curr; u1.stimes(t_i, t_f);
+	u1=u_curr_; u1.stimes(t_i, t_f);
       }
       t0=t0+p_.ts(); // return updated time
     }
@@ -137,32 +134,31 @@ namespace sac {
   inline void sac_step::SimInitXRho( const double &t0, const state_type &x0, 
 				     const b_control &u1 ) {
     u=u1;
-    x_vec.clear(); times.clear(); x = x0;  // re-initialize state 
-    simX( xdot, x, t0, t0+p_.calc_tm(), x_vec, times );  //  old_u2
+    x_vec.clear(); times.clear(); x_ = x0;  // re-initialize state 
+    simX( xdot_, x_, t0, t0+p_.calc_tm(), x_vec, times );  //  old_u2
     x_vec.pop_back(); times.pop_back();
-    simX( xdot, x, t0+p_.calc_tm(), tf, x_vec, times );  //  no control
+    simX( xdot_, x_, t0+p_.calc_tm(), tf, x_vec, times );  //  no control
     x_intp( t0+p_.ts(), x0noU );
     rho_vec.clear(); rho_times.clear();  // empty the vectors
-    m_mrho_tf = J1.get_dmdx( );
-    for ( j = 0; j < rho.size(); j++ ) { rho[j] = m_mrho_tf(j); }
-    steps = simRho( rho_dot, rho, t0, tf, rho_vec, rho_times );    
+    m_mrho_tf_ = J1_.get_dmdx( );
+    for ( j_ = 0; j_ < rho_.size(); j_++ ) { rho_[j_] = m_mrho_tf_(j_); }
+    steps_ = simRho( rho_dot_, rho_, t0, tf, rho_vec, rho_times );    
   }
   
   // simulate to update x_vec, times and interpolation objects
   inline void sac_step::SimNewX( const double &t0, const state_type &x0, 
 				 const b_control &u1 ) {
-    x_vec.clear(); times.clear(); x = x0;  // re-initialize state 
+    x_vec.clear(); times.clear(); x_ = x0;  // re-initialize state 
     u=u1;
-    simX( xdot, x, t0, t0+p_.calc_tm(), x_vec, times );  // u_old
+    simX( xdot_, x_, t0, t0+p_.calc_tm(), x_vec, times );  // u_old
     x_vec.pop_back(); times.pop_back();
-    simX( xdot, x, t0+p_.calc_tm(), t_i, x_vec, times ); // pre-u_new 
+    simX( xdot_, x_, t0+p_.calc_tm(), t_i, x_vec, times ); // pre-u_new 
     x_vec.pop_back(); times.pop_back();
-    u=u_curr; u.stimes( t_i, t_f );                // update u
-    simX( xdot, x, t_i, t_f, x_vec, times );       // u_new 
+    u=u_curr_; u.stimes( t_i, t_f );                // update u
+    simX( xdot_, x_, t_i, t_f, x_vec, times );       // u_new 
     x_vec.pop_back(); times.pop_back();
-    simX( xdot, x, t_f, tf, x_vec, times );        // post-u_new 
-  }
-  //]  
+    simX( xdot_, x_, t_f, tf, x_vec, times );        // post-u_new 
+  }  
 
 }
 

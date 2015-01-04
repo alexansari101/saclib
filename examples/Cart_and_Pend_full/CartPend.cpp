@@ -14,10 +14,6 @@
 
 using namespace sac;
 
-inline void state_proj( state_type & x );  // required by traj_cost class
-inline void get_DesTraj( const double t, const state_type &x,
-			 vec_type &m_mxdes );
-
 int main(int /* argc */ , char** /* argv */ )
 {
     using namespace std;
@@ -37,9 +33,10 @@ int main(int /* argc */ , char** /* argv */ )
     params.P() = mat_type::Zero(4,4);
     params.Q()(0,0) = 200; params.Q()(2,2) = 100; params.Q()(3,3) = 50;
     params.R() << 0.3;
+    params.proj = []( state_type & x ) { AngleWrap( x[0] ); };
 
     /* initialize SAC stepper */
-    sac_step SACit( params, get_DesTraj );
+    sac_step SACit( params );
 
     /* simulation start/stop times */
     double t0=0.0, tsim = 10;
@@ -52,8 +49,7 @@ int main(int /* argc */ , char** /* argv */ )
     vector<state_type> x_out, u2list, TiTappTf;
     vector<double> state_times;
     state_intp traj_intp(x_out, state_times, params.xlen());
-    traj_cost J_traj( traj_intp, state_proj, u2list, TiTappTf, 
-		      get_DesTraj, SACit.m_mxdes_tf, params );
+    traj_cost J_traj( traj_intp, u2list, TiTappTf, params );
     //
     J_traj.Q() = params.Q(); J_traj.P() = params.P();
     J_traj.R() << 0.3;
@@ -85,23 +81,10 @@ int main(int /* argc */ , char** /* argv */ )
     //[ /* Compute final trajectory cost */
     J_traj.compute_cost( 0.0, state_times.back() );
     J_traj.print();
-    //]
+    //]    
   
     return 0;
 }
 
 
-/*******************************************
-   Projection for calculations involving x(t) */
-inline void state_proj( state_type & x ) {
-  AngleWrap( x[0] );
-}
 
-
-/*******************************************
-   outputs a point in the desired trajectory at time t */
-inline void get_DesTraj( const double /*t*/,
-			 const state_type &/*x*/,
-			 vec_type &m_mxdes ) {
-  m_mxdes << 0, 0, 0, 0;
-}

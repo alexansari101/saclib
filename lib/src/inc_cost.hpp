@@ -3,7 +3,7 @@
 
 namespace sac {
 
-  //! \warning Class MUST BE MODIFIED BY USER to accomodate angle wrapping
+  //! \warning Projection and derivative of projection in testing
   /*!
     General incremental trajectory tracking cost, \f$l(x)\f$, for integration
     \f$J_1 = \int_{t_0}^{t_f} l(x) \, dt + m(x(t_f))\f$.  Keeps references to 
@@ -12,8 +12,6 @@ namespace sac {
   */
   class inc_cost {
     vec_type mx_;
-    void (*p_get_DesTraj)( const double t, const state_type &x,
-			   vec_type &mxdes ); // desired trajectory
     Params & p_;
   
   public:
@@ -26,17 +24,12 @@ namespace sac {
       Initializes references to user maintained trajectory object and a pointer
       to the desired trajectory.
       \param[in] x_intp User maintained state interpolation object
-      \param[in] xdesFnptr Pointer to the desired trajectory
       \param[in] p SAC parameters
     */
-    inc_cost( state_intp & x_intp,
-	      void (* xdesFnptr) ( const double t, const state_type &x
-				   vec_type &mxdes ),
-	      Params & p
-	      ): mx_(vec_type::Zero(p.xlen(),1)), 
-		 p_get_DesTraj( xdesFnptr ), p_(p),
-		 m_x_intp( x_intp ), m_x( p.xlen() ),
-		 m_mxdes(vec_type::Zero(p.xlen(),1)) { }
+    inc_cost( state_intp & x_intp, Params & p )
+      : mx_(vec_type::Zero(p.xlen(),1)), 
+	p_(p), m_x_intp( x_intp ), m_x( p.xlen() ),
+	m_mxdes( vec_type::Zero(p.xlen(),1) ) { }
   
     /*!
       Computes the value of incremental trajectory tracking cost, \f$l(x)\f$.
@@ -47,12 +40,14 @@ namespace sac {
     void operator() (const state_type &/*J*/, state_type &dJdt, const double t)
     {
       m_x_intp(t, m_x); // store the current state in x
+      p_.proj( m_x );
+      //
+      p_.x_des( t, m_x, m_mxdes ); // Get desired trajectory point
+      //
       State2Mat( m_x, mx_ ); // convert state to matrix form
       //
-      p_get_DesTraj( t, m_x, m_mxdes ); // Get desired trajectory point
-      //
       dJdt[0] = ( ( (mx_-m_mxdes).transpose() * p_.Q() 
-		    * (mx_-m_mxdes) ) / 2.0 )(0);
+      		    * (mx_-m_mxdes) ) / 2.0 )(0);
     }
 
     /*!
@@ -65,7 +60,9 @@ namespace sac {
     inline void dx( const double t, const vec_type &mx,
 		    mat_type &dldx ) { 
       Mat2State( mx, m_x);
-      p_get_DesTraj( t, m_x, m_mxdes ); // Get desired trajectory point
+      p_.proj( m_x );
+      //
+      p_.x_des( t, m_x, m_mxdes ); // Get desired trajectory point
       //
       dldx = (mx-m_mxdes).transpose()*p_.Q();
     }

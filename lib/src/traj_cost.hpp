@@ -9,13 +9,10 @@ namespace sac {
   */
   class inc_state_cost {
     state_intp & rx_intp_;
-    void (*p_state_Proj) ( state_type & x );      // pointer to function to project state
-    void (*p_get_DesTraj)( const double t, const state_type &x,
-			   vec_type &mxdes ); // desired trajectory
-    vec_type mxdes_;
     mat_type & rmQ_;
     state_type x_;
-    vec_type mx_;
+    vec_type mx_, mxdes_;
+    Params & p_;
 
   public:
 
@@ -23,25 +20,19 @@ namespace sac {
       Constructs a inc_state_cost object to computes the value of incremental trajectory 
       tracking cost, \f$l(x(t))\f$ when called by a trajectory cost object.
       \param[in] rx_intp Reference to state interpolation object
-      \param[in] xProjFnptr Pointer to a function that projects the state for 
-      angle wrapping (etc) before it is used in calcs
-      \param[in] xdesFnptr Pointer to a function that evaluates \f$x_{des}(t)\f$
-      \param[in] rmQ  Weight matrix defining norm on incremental state tracking error
+      \param[in] rmQ  Weight matrix defining norm on incremental state 
+      tracking error
       \param[in] p SAC parameters
     */
     inc_state_cost( state_intp & rx_intp,
-		    void (*xProjFnptr) ( state_type & x ),
-		    void (*xdesFnptr) ( const double t, const state_type &x,
-					vec_type &mxdes ),
 		    mat_type & rmQ,
 		    Params & p
-		    ) : rx_intp_( rx_intp ),		      
-			p_state_Proj( xProjFnptr ),
-			p_get_DesTraj( xdesFnptr ), 
-			mxdes_( vec_type::Zero(p.xlen(),1) ),
+		    ) : rx_intp_( rx_intp ),
 			rmQ_( rmQ ),
 			x_(p.xlen()),
-			mx_( vec_type::Zero(p.xlen(),1) ) { }
+			mx_( vec_type::Zero(p.xlen(),1) ),
+			mxdes_( vec_type::Zero(p.xlen(),1) ),
+			p_(p) { }
 
 
     /*!
@@ -53,10 +44,10 @@ namespace sac {
     void operator () (const state_type &/*J*/, state_type &dJdt, const double t)
     {
       rx_intp_(t, x_); // store the current state in x
-      p_state_Proj( x_ ); // project state if necessary
+      p_.proj( x_ ); // project state if necessary
       State2Mat( x_, mx_ ); // convert state to matrix form
       //
-      p_get_DesTraj( t, x_, mxdes_ ); // Get desired trajectory point
+      p_.x_des( t, x_, mxdes_ ); // Get desired trajectory point
       //
       dJdt[0] = ( ( (mx_- mxdes_).transpose() * rmQ_ 
 		    * (mx_- mxdes_) ) / 2.0 )(0);
@@ -79,9 +70,7 @@ namespace sac {
   */
   class traj_cost {
     state_intp & rx_intp_;
-    void (*p_state_Proj) ( state_type & x );      // pointer to function to project state
     std::vector<state_type> & ru2list_, & rTiTappTf_;
-    const vec_type & rmxdes_tf_;
     mat_type mQ_;
     mat_type mP1_;
     mat_type mR_;
@@ -90,6 +79,7 @@ namespace sac {
     vec_type mu2_;
     double integ_state_cost_, u2cost_, term_cost_;
     inc_state_cost inc_tracking_cost_;
+    Params & p_;
 
   public:
 
@@ -98,39 +88,29 @@ namespace sac {
       Constructs a traj_cost object from a state interpolation object, desired
       state trajectory, and the list of controls and application times.
       \param[in] rx_intp Reference to state interpolation object
-      \param[in] xProjFnptr Pointer to a function that projects the state for 
-      angle wrapping (etc) before it is used in calcs
       \param[in] ru2list Reference to list of applied control
       \param[in] rTiTappTf Reference to list of application times for u2
-      \param[in] xdesFnptr Pointer to a function that evaluates \f$x_{des}(t)\f$
-      \param[in] rmxdes_tf Reference to \f$x_{des}(t_f)\f$
       \param[in] p SAC parameters
     */
     traj_cost( state_intp & rx_intp,
-	       void (*xProjFnptr) ( state_type & x ),
 	       std::vector<state_type> & ru2list,
 	       std::vector<state_type> & rTiTappTf,
-	       void (*xdesFnptr) ( const double t, const state_type &x, 
-				   vec_type &mxdes ),
-	       const vec_type & rmxdes_tf,
-	       Params & p
-	       ) : rx_intp_( rx_intp ),
-		   p_state_Proj( xProjFnptr ),
-		   ru2list_( ru2list ),
-		   rTiTappTf_( rTiTappTf ),
-		   rmxdes_tf_( rmxdes_tf ),
-		   mQ_( mat_type::Identity(p.xlen(),p.xlen()) ),
-                   mP1_( mat_type::Zero(p.xlen(),p.xlen()) ),
-                   mR_( mat_type::Identity(p.ulen(),p.ulen()) ),
-                   x_(p.xlen()),
-                   cost_(1),
-                   mx_( vec_type::Zero(p.xlen(),1) ),
-                   mu2_( vec_type::Zero(p.ulen(),1) ),
-                   integ_state_cost_(0.0), 
-                   u2cost_(0.0),
-                   term_cost_(0.0),
-                   inc_tracking_cost_( rx_intp, xProjFnptr, xdesFnptr, mQ_, p )
-    { }
+	       Params & p ) 
+      : rx_intp_( rx_intp ),
+	ru2list_( ru2list ),
+	rTiTappTf_( rTiTappTf ),
+	mQ_( mat_type::Identity(p.xlen(),p.xlen()) ),
+        mP1_( mat_type::Zero(p.xlen(),p.xlen()) ),
+        mR_( mat_type::Identity(p.ulen(),p.ulen()) ),
+        x_(p.xlen()),
+        cost_(1),
+        mx_( vec_type::Zero(p.xlen(),1) ),
+        mu2_( vec_type::Zero(p.ulen(),1) ),
+        integ_state_cost_(0.0), 
+        u2cost_(0.0),
+        term_cost_(0.0),
+        inc_tracking_cost_( rx_intp, mQ_, p ),
+        p_(p)  { }
 
   
     /*!
@@ -206,16 +186,17 @@ namespace sac {
     // compute terminal cost
     term_cost_ = 0;  
     rx_intp_(tf-eps, x_);
-    p_state_Proj( x_ ); // project state if necessary
+    p_.proj( x_ ); // project state if necessary
     State2Mat( x_, mx_ ); // convert state to matrix form
-    cost_[0] = ( ( (mx_- rmxdes_tf_).transpose() * mP1_ 
-		   * (mx_- rmxdes_tf_) ) / 2.0 )(0);
+    cost_[0] = ( ( (mx_- p_.mxdes_tf()).transpose() * mP1_ 
+		   * (mx_- p_.mxdes_tf()) ) / 2.0 )(0);
     term_cost_ = cost_[0];
   
     // integrate appending incremental state tracking cost to terminal cost
     typedef runge_kutta_dopri5< state_type > stepper_type;
 
-    size_t J_steps = integrate_adaptive( make_controlled( 1E-5 , 1E-5 , 
+    size_t J_steps = integrate_adaptive( make_controlled( p_.eps_cost( ) , 
+							  p_.eps_cost( ) , 
 							  stepper_type( ) ) , 
 					 inc_tracking_cost_ , cost_ , t0 , tf-eps , 0.01 );
 
