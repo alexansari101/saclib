@@ -11,9 +11,9 @@ namespace sac {
     changes state trajectory are automatically accounted for.
   */
   class adjoint {
-    state_type x_, u1_, rho_;
+    state_type x_, u1_;
     vec_type mx_, mrho_, mrhodot_;
-    mat_type mdldx_;
+    vec_type mdldx_;
     mat_type mdfdx_;
     size_t indx_;
     Params & p_;
@@ -34,10 +34,10 @@ namespace sac {
     */
     adjoint( state_intp & x_intp, cost & J,
 	     Params & p ) :  x_(p.xlen()), u1_(p.ulen()),
-			     rho_(p.xlen()), mx_(p.xlen(),1),
-			     mrho_(p.xlen(),1), mrhodot_(p.xlen(),1),
-			     mdldx_(1,p.xlen()), mdfdx_(p.xlen(),p.xlen()),
-			     p_(p), m_x_intp( x_intp ),
+			     mx_(p.xlen(),1), mrho_(p.xlen(),1), 
+			     mrhodot_(p.xlen(),1), mdldx_(1,p.xlen()),
+			     mdfdx_(p.xlen(),p.xlen()), p_(p), 
+			     m_x_intp( x_intp ),
 			     m_lofx(J.m_lofx) {  
       for ( size_t i=0; i<p.ulen(); i++ ) { u1_[i] = 0.0; } 
     }
@@ -52,21 +52,20 @@ namespace sac {
     */
     void operator() (const state_type &rho, state_type &rhodot, const double t)
     {
-      rho_ = rho;
       m_x_intp(t, x_);        // store the current state in x
       //
       m_lin.A( x_, u1_, mdfdx_ );
-      //
-      p_.proj( x_ );  //! \todo Alex: decide if this should go before lin.A()
+      //! \todo Alex: decide if proj should go before lin.A()
+      p_.proj( x_ );
       //
       State2Mat( x_, mx_ );   // convert state to matrix form
-      State2Mat( rho_, mrho_ );
+      State2Mat( rho, mrho_ );
       //
       m_lofx.dx( t, mx_, mdldx_ );
       //
       mrhodot_ = -mdldx_.transpose() - mdfdx_.transpose()*mrho_;
       //
-      for (indx_ = 0; indx_ < rho.size(); indx_++ ) { rhodot[indx_] = mrhodot_(indx_); }
+      Mat2State( mrhodot_ , rhodot );
     }
   };
 

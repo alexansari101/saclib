@@ -14,6 +14,7 @@ namespace sac {
     double t0_, tf_;
     size_t J1steps_;
     vec_type mx_tf_;
+    mat_type mdproj_x_tf_;
     Params & p_;
   
   public:
@@ -29,8 +30,9 @@ namespace sac {
     */
     cost( state_intp & x_intp, Params & p ) 
       : J1_(1), x_tf_( p.xlen() ), t0_( 0.0 ), tf_( 0.0 ), 
-	J1steps_(0), mx_tf_(p.xlen(),1), p_(p), 
-	m_lofx( x_intp, p ), m_x_intp( x_intp ) { }
+	J1steps_(0), mx_tf_(p.xlen(),1), 
+	mdproj_x_tf_( mat_type::Identity(p.xlen(),p.xlen()) ), 
+	p_(p), 	m_lofx( x_intp, p ), m_x_intp( x_intp ) { }
 
     /*! 
       Get the cost at the terminal time, \f$m(x(t_f))\f$.
@@ -52,12 +54,16 @@ namespace sac {
       \return \f$(x(t_f)-x_{des}(t_f))^T\;P_1\f$, which is \f$D_x m(x(t_f))\f$
       assuming a quadratic form for the terimal cost.
     */
-    inline mat_type get_dmdx( ) { 
+    inline vec_type get_dmdx( ) { 
       t0_ = m_lofx.begin();
       tf_ = m_lofx.end();
       m_x_intp( tf_, x_tf_ );
+      //! \todo: Alex: double check the order of proj and dproj calls
+      p_.dproj( x_tf_, mdproj_x_tf_ );
+      p_.proj( x_tf_ );
+      //
       State2Mat( x_tf_, mx_tf_ );
-      return (mx_tf_-p_.mxdes_tf()).transpose()*p_.P();
+      return (mx_tf_-p_.mxdes_tf()).transpose()*p_.P()*mdproj_x_tf_;
     }
   
     /*!

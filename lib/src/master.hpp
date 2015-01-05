@@ -44,9 +44,9 @@ namespace sac {
   /*********************************************/
   /* Function Prototypes */
   template< class T >
-  inline void State2Mat( state_type & s, T & matOut );
+  inline void State2Mat( const state_type & s, T & matOut );
   template< class T >
-  inline void Mat2State( T & mat, state_type & sOut );
+  inline void Mat2State( const T & mat, state_type & sOut );
   template < class Scalar >
   inline void AngleWrap( Scalar & theta );
   template < class T , class Scalar >
@@ -145,28 +145,26 @@ namespace sac {
   //]
 
 
-  //! \todo Alex: change input references to const references.
   /*!
-    Converts a state_type vector to a matrix type.
+    Converts a state_type vector to a vector_type.
     \param[in] s A state_type vector.
     \param[out] matOut A matrix with the same # of rows as the input vector.
   */
   template< class T >
-  inline void State2Mat( state_type & s, T & matOut ) {
+  inline void State2Mat( const state_type & s, T & matOut ) {
     for ( size_t i=0; i<s.size(); i++ ) {
       matOut(i,0) = s[i];
     }
   }
 
-  //! \todo Alex: change input references to const references.
   /*!
-    Converts a state_type vector to a matrix type.
-    \param[in] mat A column matrix.
+    Converts a vector_type to a state_type.
+    \param[in] mat A column vector.
     \param[out] sOut A state_type vector with the same # of rows as the 
     input matrix.
   */
   template< class T >
-  inline void Mat2State( T & mat, state_type & sOut ) {
+  inline void Mat2State( const T & mat, state_type & sOut ) {
     for ( size_t i=0; i<mat.rows(); i++ ) {
       sOut[i] = mat(i,0);
     }

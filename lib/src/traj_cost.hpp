@@ -71,6 +71,7 @@ namespace sac {
   class traj_cost {
     state_intp & rx_intp_;
     std::vector<state_type> & ru2list_, & rTiTappTf_;
+    vec_type mxdes_tf_;
     mat_type mQ_;
     mat_type mP1_;
     mat_type mR_;
@@ -90,15 +91,18 @@ namespace sac {
       \param[in] rx_intp Reference to state interpolation object
       \param[in] ru2list Reference to list of applied control
       \param[in] rTiTappTf Reference to list of application times for u2
+      \param[in] rmxdes_tf Reference to \f$x_{des}(t_f)\f$
       \param[in] p SAC parameters
     */
     traj_cost( state_intp & rx_intp,
 	       std::vector<state_type> & ru2list,
 	       std::vector<state_type> & rTiTappTf,
+	       const vec_type & rmxdes_tf,
 	       Params & p ) 
       : rx_intp_( rx_intp ),
 	ru2list_( ru2list ),
 	rTiTappTf_( rTiTappTf ),
+	mxdes_tf_( rmxdes_tf ),
 	mQ_( mat_type::Identity(p.xlen(),p.xlen()) ),
         mP1_( mat_type::Zero(p.xlen(),p.xlen()) ),
         mR_( mat_type::Identity(p.ulen(),p.ulen()) ),
@@ -111,6 +115,23 @@ namespace sac {
         term_cost_(0.0),
         inc_tracking_cost_( rx_intp, mQ_, p ),
         p_(p)  { }
+
+    //! \todo Alex: Make constructor reference and pointer inputs const.
+    /*!
+      Constructs a traj_cost object from a state interpolation object, desired
+      state trajectory, and the list of controls and application times.  This 
+      alternate constructor assumes no terminal cost on trajectory.
+      \param[in] rx_intp Reference to state interpolation object
+      \param[in] ru2list Reference to list of applied control
+      \param[in] rTiTappTf Reference to list of application times for u2
+      \param[in] p SAC parameters
+    */
+    traj_cost( state_intp & rx_intp,
+    	       std::vector<state_type> & ru2list,
+    	       std::vector<state_type> & rTiTappTf,
+    	       Params & p ) 
+      : traj_cost( rx_intp, ru2list, rTiTappTf, 
+    		   vec_type::Zero(p.xlen(),1), p )  { }
 
   
     /*!
@@ -172,7 +193,6 @@ namespace sac {
   //]
 
 
-
   /*!
     \param[in] t0 The initial time for integration.
     \param[in] tf The final time for integration.
@@ -188,8 +208,8 @@ namespace sac {
     rx_intp_(tf-eps, x_);
     p_.proj( x_ ); // project state if necessary
     State2Mat( x_, mx_ ); // convert state to matrix form
-    cost_[0] = ( ( (mx_- p_.mxdes_tf()).transpose() * mP1_ 
-		   * (mx_- p_.mxdes_tf()) ) / 2.0 )(0);
+    cost_[0] = ( ( (mx_- mxdes_tf_).transpose() * mP1_ 
+		   * (mx_- mxdes_tf_) ) / 2.0 )(0);
     term_cost_ = cost_[0];
   
     // integrate appending incremental state tracking cost to terminal cost

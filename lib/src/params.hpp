@@ -43,16 +43,34 @@ namespace sac {
 
     /*!
       Projection to apply to the state matrix
-      \param[out] x a state_type storing the current state
+      \param[in,out] x a state_type storing the current state
     */
     std::function<void(state_type &)> proj;
 
     /*!
       Derivative of the state projection
-      \param[out] x a state_type storing the derivative of the projection
-      at the current state
+      \param[in] x the state at which to take the derivative of the projection
+      \param[out] dproj_x the matrix storing the derivative of the projection
     */
-    std::function<void(state_type &)> dproj;
+    std::function<void(const state_type &, mat_type &)> dproj;
+
+    // /*!
+    //   \param[in] t the time at which to compute the incremental cost value
+    //   \param[in] x the state at which to compute the incremental cost 
+    //   value. Warning, this will be projected by the function.
+    //   \return incremental state cost
+    // */
+    // std::function<double(const double &, const state_type &)> inc_x_cost;
+
+    // /*!
+    //   Computes the value of the derivative of the incremental cost, 
+    //   \f$D_x l(x)\f$.
+    //   \param[in] t The current time
+    //   \param[in] mx The current state
+    //   \param[out] dldx The derivative \f$D_x l(x)\f$.
+    // */
+    // std::function<void(const double &, const vec_type &, 
+    // 		       vec_type &)> dinc_x_cost;
 
     /*!
       Constructor for Params class to hold SAC parameters.
@@ -76,7 +94,38 @@ namespace sac {
       x_des = [this](const double & /*t*/,const state_type & /*x*/,
 		     vec_type & xdes) { xdes.Zero(this->xlen_,1); };
       proj = [](state_type & /*x*/) { };
-      dproj = [](state_type & /*x*/) { };
+      dproj = [](const state_type & /*x*/, mat_type & /*dproj_x*/) { };
+      
+      // inc_x_cost = [this](const double & t, const state_type & x) {
+      // 	static vec_type mxdes(this->xlen_,1);
+      // 	static vec_type mx(this->xlen_,1);
+      // 	static state_type sx(this->xlen_);
+      // 	sx=x; //! todo: Alex: find *good* way to avoid this copy
+      // 	//
+      // 	this->proj( sx );
+      // 	this->x_des( t, sx, mxdes ); // Get desired trajectory point
+      // 	State2Mat( sx, mx ); // convert state to matrix form
+      // 	//
+      // 	return ( ( (mx-mxdes).transpose() * this->Q() 
+      // 		   * (mx-mxdes) ) / 2.0 )(0);
+      // };
+      
+      // dinc_x_cost = [this](const double &t, const vec_type &mx,
+      // 			   vec_type &dldx) {
+      // 	static state_type m_x(this->xlen_,1);
+      // 	static vec_type m_mxdes(this->xlen_,1);
+      // 	static mat_type mdproj_x( mat_type::Identity(this->xlen_,this->xlen_) 
+      // 				  );
+      // 	Mat2State( mx, m_x);
+      // 	//! \todo: Alex: double check the order of proj and dproj calls
+      // 	//! \todo: Alex: note that mx is already proj in adjoint.hpp
+      // 	this->dproj( m_x, mdproj_x );
+      // 	this->proj( m_x );
+      // 	//
+      // 	this->x_des( t, m_x, m_mxdes ); // Get desired trajectory point
+      // 	//
+      // 	dldx = (mx-m_mxdes).transpose()*this->Q()*mdproj_x;
+      // };
     }
 
     /*!

@@ -12,6 +12,7 @@ namespace sac {
   */
   class inc_cost {
     vec_type mx_;
+    mat_type mdproj_x_;
     Params & p_;
   
   public:
@@ -28,6 +29,7 @@ namespace sac {
     */
     inc_cost( state_intp & x_intp, Params & p )
       : mx_(vec_type::Zero(p.xlen(),1)), 
+	mdproj_x_( mat_type::Identity(p.xlen(),p.xlen()) ),
 	p_(p), m_x_intp( x_intp ), m_x( p.xlen() ),
 	m_mxdes( vec_type::Zero(p.xlen(),1) ) { }
   
@@ -48,8 +50,11 @@ namespace sac {
       //
       dJdt[0] = ( ( (mx_-m_mxdes).transpose() * p_.Q() 
       		    * (mx_-m_mxdes) ) / 2.0 )(0);
+
+      // dJdt[0] = p_.inc_x_cost( t, m_x );
     }
 
+    //! \todo: Alex: is it ok that this needs to be called with proj(mx)?
     /*!
       Computes the value of the derivative of the incremental cost, 
       \f$D_x l(x)\f$.
@@ -58,13 +63,15 @@ namespace sac {
       \param[out] dldx The derivative \f$D_x l(x)\f$.
     */
     inline void dx( const double t, const vec_type &mx,
-		    mat_type &dldx ) { 
+		    vec_type &dldx ) { 
       Mat2State( mx, m_x);
-      p_.proj( m_x );
+      p_.dproj( m_x, mdproj_x_ );
       //
       p_.x_des( t, m_x, m_mxdes ); // Get desired trajectory point
       //
-      dldx = (mx-m_mxdes).transpose()*p_.Q();
+      dldx = (mx-m_mxdes).transpose()*p_.Q()*mdproj_x_;
+
+      // p_.dinc_x_cost( t, mx, dldx );
     }
 
     /*!
