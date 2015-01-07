@@ -13,7 +13,7 @@ namespace sac {
   class adjoint {
     state_type x_, u1_;
     vec_type mx_, mrho_, mrhodot_;
-    vec_type mdldx_;
+    vec_type mgrad_lofx_;
     mat_type mdfdx_;
     size_t indx_;
     Params & p_;
@@ -35,7 +35,7 @@ namespace sac {
     adjoint( state_intp & x_intp, cost & J,
 	     Params & p ) :  x_(p.xlen()), u1_(p.ulen()),
 			     mx_(p.xlen(),1), mrho_(p.xlen(),1), 
-			     mrhodot_(p.xlen(),1), mdldx_(1,p.xlen()),
+			     mrhodot_(p.xlen(),1), mgrad_lofx_(p.xlen(),1),
 			     mdfdx_(p.xlen(),p.xlen()), p_(p), 
 			     m_x_intp( x_intp ),
 			     m_lofx(J.m_lofx) {  
@@ -61,9 +61,9 @@ namespace sac {
       State2Mat( x_, mx_ );   // convert state to matrix form
       State2Mat( rho, mrho_ );
       //
-      m_lofx.dx( t, mx_, mdldx_ );
+      m_lofx.grad( t, mx_, mgrad_lofx_ );
       //
-      mrhodot_ = -mdldx_.transpose() - mdfdx_.transpose()*mrho_;
+      mrhodot_ = -mgrad_lofx_ - mdfdx_.transpose()*mrho_;
       //
       Mat2State( mrhodot_ , rhodot );
     }

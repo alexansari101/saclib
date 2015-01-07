@@ -50,11 +50,11 @@ namespace sac {
     }
   
     /*! 
-      Get the derivative of the terminal time, \f$D_x m(x(t_f))\f$.
-      \return \f$(x(t_f)-x_{des}(t_f))^T\;P_1\f$, which is \f$D_x m(x(t_f))\f$
+      Get the gradient of the terminal time, \f$D_x m(x(t_f))\f$.
+      \param[out] Gmofx \f$P_1\;(x(t_f)-x_{des}(t_f))\f$, which is \f$D_x m(x(t_f))^T\f$
       assuming a quadratic form for the terimal cost.
     */
-    inline vec_type get_dmdx( ) { 
+    inline void grad_mofx( vec_type & Gmofx ) { 
       t0_ = m_lofx.begin();
       tf_ = m_lofx.end();
       m_x_intp( tf_, x_tf_ );
@@ -63,7 +63,7 @@ namespace sac {
       p_.proj( x_tf_ );
       //
       State2Mat( x_tf_, mx_tf_ );
-      return (mx_tf_-p_.mxdes_tf()).transpose()*p_.P()*mdproj_x_tf_;
+      Gmofx = mdproj_x_tf_*p_.P()*(mx_tf_-p_.mxdes_tf());
     }
   
     /*!

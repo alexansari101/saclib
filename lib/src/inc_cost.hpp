@@ -56,20 +56,20 @@ namespace sac {
 
     //! \todo: Alex: is it ok that this needs to be called with proj(mx)?
     /*!
-      Computes the value of the derivative of the incremental cost, 
-      \f$D_x l(x)\f$.
+      Computes the value of the gradient of the incremental cost, 
+      \f$D_x l(x)^T\f$.
       \param[in] t The current time
       \param[in] mx The current state
-      \param[out] dldx The derivative \f$D_x l(x)\f$.
+      \param[out] dldx The gradient \f$D_x l(x)^T\f$.
     */
-    inline void dx( const double t, const vec_type &mx,
-		    vec_type &dldx ) { 
+    inline void grad( const double t, const vec_type &mx,
+		      vec_type &Glofx ) { 
       Mat2State( mx, m_x);
       p_.dproj( m_x, mdproj_x_ );
       //
       p_.x_des( t, m_x, m_mxdes ); // Get desired trajectory point
       //
-      dldx = (mx-m_mxdes).transpose()*p_.Q()*mdproj_x_;
+      Glofx = mdproj_x_*p_.Q()*(mx-m_mxdes);
 
       // p_.dinc_x_cost( t, mx, dldx );
     }

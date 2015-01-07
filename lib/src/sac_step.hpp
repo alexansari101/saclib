@@ -140,8 +140,8 @@ namespace sac {
     simX( xdot_, x_, t0+p_.calc_tm(), tf, x_vec, times );  //  no control
     x_intp( t0+p_.ts(), x0noU );
     rho_vec.clear(); rho_times.clear();  // empty the vectors
-    m_mrho_tf_ = J1_.get_dmdx( );
-    for ( j_ = 0; j_ < rho_.size(); j_++ ) { rho_[j_] = m_mrho_tf_(j_); }
+    J1_.grad_mofx( m_mrho_tf_ );
+    Mat2State( m_mrho_tf_, rho_ );
     steps_ = simRho( rho_dot_, rho_, t0, tf, rho_vec, rho_times );    
   }
   

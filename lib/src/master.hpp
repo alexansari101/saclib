@@ -38,7 +38,7 @@ namespace sac {
   typedef Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic, 
   			 0, CONST_MAT, CONST_MAT  > mat_type;
   typedef Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic, 
-  			 0, CONST_MAT, CONST_MAT  > vec_type;
+  			 0, CONST_MAT, 1  > vec_type;
 #endif
 
   /*********************************************/
