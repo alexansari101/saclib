@@ -351,7 +351,6 @@ namespace sac {
   }
 
 
-  //! \todo Alex: See about changing src input to const ref type.
   /*!
     Saves a 2D iterable object to a csv.  To read in Matlab use: M = 
     csvread('file.csv')
@@ -359,7 +358,7 @@ namespace sac {
     \param[in] outputFilename The filename to save the csv file as.
   */
   template < class T >
-  void SaveVec( T src, const char * outputFilename ) {
+  void SaveVec( const T & src, const char * outputFilename ) {
     using namespace std; 
     // ofs ("test.csv", std::ofstream::out | std::ofstream::app);
     std::ofstream ofs ( outputFilename, std::ofstream::out ); 
