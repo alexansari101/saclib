@@ -63,8 +63,7 @@ namespace sac {
   /*!
     Evaluates the trajectory cost over a defined horizon from state and
     control matrices.  
-    \f$J_{traj} = \frac{1}{2} \int_{t_0}^{t_f} \lVert x(t)-x_{des}(t) \rVert_{Q} 
-    + \lVert u(t) \rVert_{R} \, dt + \frac{1}{2} \lVert x(t_f)-x_{des}(t_f) \rVert_{P_1}\f$
+    \f$J_1 = \frac{1}{2}\int_{t_0}^{t_f} (x-x_{des})^T Q\, (x-x_{des}) + u^T R\, u  \, dt + \frac{1}{2}(x-x_{des})^T P\, (x-x_{des})\f$
     Keeps references to state interpolator so that changes in state trajectory 
     are automatically accounted for.
   */
