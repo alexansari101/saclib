@@ -8,6 +8,11 @@ namespace sac {
   const double p1 = 0.0308, p2 = 0.0106, p3 = 0.0095,
     p4 = 0.2087, p5 = 0.0629;
 
+  std::vector< std::vector< double > > get_csv( const char * filename );
+  double s1_intp(double th1, double th2);
+  double s2_intp(double th1, double th2);
+  mat_type Gxdes(double th1, double th2);
+
 
   //[ The rhs of x' = f(x) defined as a class
   // USER SPECIFIED:
@@ -36,6 +41,74 @@ namespace sac {
     }
   };
   //]
+
+
+double s1_intp(double th1, double th2) {
+  static auto s1 = get_csv( "sth1dot.csv" );
+  static auto s2 = get_csv( "sth2dot.csv" );
+  static double dth = 0.10755;
+  static double min_th = -3.38782;
+  AngleWrap( th1 ); AngleWrap( th2 );
+  size_t xindx = round( (th2 - min_th)/dth );
+  size_t yindx = round( (th1 - min_th)/dth );
+      
+  return s1[xindx][yindx];
+}
+
+double s2_intp(double th1, double th2) {
+  static auto s1 = get_csv( "sth1dot.csv" );
+  static auto s2 = get_csv( "sth2dot.csv" );
+  static double dth = 0.10755;
+  static double min_th = -3.38782;
+  AngleWrap( th1 ); AngleWrap( th2 );
+  size_t xindx = round( (th2 - min_th)/dth );
+  size_t yindx = round( (th1 - min_th)/dth );
+      
+  return s2[xindx][yindx];
+}
+
+/* 
+   Note:
+   dxdesdx = [ 0        ds1dth1  0        ds2dth1 ]
+             [ 0        0        0        0       ]
+	     [ 0        ds1dth2  0        ds2dth2 ]
+	     [ 0        0        0        0       ]
+*/
+mat_type Gxdes(double th1, double th2) {
+  static double dth = 0.108;
+  static mat_type gxdesdx = mat_type::Zero(4,4);
+  // gsdth1
+  gxdesdx(0,1) = (s1_intp(th1+dth,th2)-s1_intp(th1-dth,th2))/(2.0*dth);
+  gxdesdx(0,3) = (s2_intp(th1+dth,th2)-s2_intp(th1-dth,th2))/(2.0*dth);
+  // gsdth2
+  gxdesdx(2,1) = (s1_intp(th1,th2+dth)-s1_intp(th1,th2-dth))/(2.0*dth);
+  gxdesdx(2,3) = (s2_intp(th1,th2+dth)-s2_intp(th1,th2-dth))/(2.0*dth);
+  //
+  return gxdesdx;
+}
+
+
+/*!
+    Read in a numeric csv to a 2D vector of doubles
+    \param[in] filename The csv filename to read in
+*/
+std::vector< std::vector< double > > get_csv( const char * filename ) {
+  using namespace std; 
+  ifstream file( filename );
+  string line;
+  vector< vector< double > > mat;
+
+  while ( getline( file, line ) ) {
+    stringstream strstr( line );
+    string svalue;
+    vector< double > vals;
+    while ( getline( strstr, svalue, ',' ) ) {
+      vals.push_back( stod(svalue) );
+    }
+    mat.push_back( std::move(vals) );
+  }
+  return mat;
+}
 
 }
 

@@ -14,11 +14,6 @@
 
 using namespace sac;
 
-std::vector< std::vector< double > > get_csv( const char * filename );
-
-double s1_intp(double th1, double th2);
-double s2_intp(double th1, double th2);
-
 //[ The rhs of x' = f(x,-kx) defined as a class
 // USER SPECIFIED:
 class fb_sys_dynam {
@@ -62,15 +57,16 @@ int main(int /* argc */ , char** /* argv */ )
 
     /* initialize SAC parameters */
     Params params(4,1);
-    params.T() = 0.1; // 0.1;
+    params.T() = 0.6; // 0.1;
     params.lam() = -15;
     params.maxdt() = 0.2;
     params.ts() = 0.005;
-    params.usat() = { {5, -5} }; // { {5/6/7, -5/6/7} };
+    params.usat() = { {7, -7} }; // { {5/6/7, -5/6/7} };
     params.calc_tm() = params.ts();
     params.u2search() = true; // true
     params.Q() = mat_type::Zero(4,4);
     params.P() = mat_type::Zero(4,4);
+    params.Q()(1,1) = 1; params.Q()(3,3) = 5;
     params.P()(1,1) = 15; params.P()(3,3) = 10; // 1,10 ; 5,10 ; 15, 10;
     params.R() << 0.1;
     params.proj = []( state_type & x ) { AngleWrap( x[0] ); 
@@ -162,63 +158,15 @@ int main(int /* argc */ , char** /* argv */ )
     //[ /* Compute final trajectory cost */
     J_traj.compute_cost( 0.0, state_times.back() );
     J_traj.print();
-    //]    
+    //]  
 
-    //[
-    // auto s1 = get_csv( "sth1dot.csv" );
-    // auto s2 = get_csv( "sth2dot.csv" );
-    
-    // cout << s1.size() << endl;
-    // cout << s1[0].size() << endl;
-    // cout << s1[1][2] << endl;
-    //]
+    // mat_type ans = mat_type::Zero(4,4);
+    // ans = Gxdes(-2, -1);
+    // cout << ans << endl;
+
+    // cout << "s1 = " << s1_intp(-2.108, -1) << endl;
+    // cout << "s2 = " << s2_intp(-2, -1+.108) << endl;
+    // cout << "s2 = " << s2_intp(-2, -1-.108) << endl;
   
     return 0;
-}
-
-double s1_intp(double th1, double th2) {
-     static auto s1 = get_csv( "sth1dot.csv" );
-     static auto s2 = get_csv( "sth2dot.csv" );
-     static double dth = 0.10755;
-     static double min_th = -3.38782;
-     AngleWrap( th1 ); AngleWrap( th2 );
-     size_t xindx = round( (th2 - min_th)/dth );
-     size_t yindx = round( (th1 - min_th)/dth );
-      
-     return s1[xindx][yindx];
-}
-
-double s2_intp(double th1, double th2) {
-     static auto s1 = get_csv( "sth1dot.csv" );
-     static auto s2 = get_csv( "sth2dot.csv" );
-     static double dth = 0.10755;
-     static double min_th = -3.38782;
-     AngleWrap( th1 ); AngleWrap( th2 );
-     size_t xindx = round( (th2 - min_th)/dth );
-     size_t yindx = round( (th1 - min_th)/dth );
-      
-     return s2[xindx][yindx];
-}
-
-
-/*!
-    Read in a numeric csv to a 2D vector of doubles
-    \param[in] filename The csv filename to read in
-*/
-std::vector< std::vector< double > > get_csv( const char * filename ) {
-  using namespace std; 
-  ifstream file( filename );
-  string line;
-  vector< vector< double > > mat;
-
-  while ( getline( file, line ) ) {
-    stringstream strstr( line );
-    string svalue;
-    vector< double > vals;
-    while ( getline( strstr, svalue, ',' ) ) {
-      vals.push_back( stod(svalue) );
-    }
-    mat.push_back( std::move(vals) );
-  }
-  return mat;
 }

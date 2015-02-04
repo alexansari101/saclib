@@ -48,11 +48,11 @@ namespace sac {
     std::function<void(state_type &)> proj;
 
     /*!
-      Derivative of the state projection
-      \param[in] x the state at which to take the derivative of the projection
-      \param[out] dproj_x the matrix storing the derivative of the projection
+      Gradient of the state projection
+      \param[in] x the state at which to take the gradient of the projection
+      \param[out] gproj_x the matrix storing the gradient of the projection
     */
-    std::function<void(const state_type &, mat_type &)> dproj;
+    std::function<void(const state_type &, mat_type &)> gproj;
 
     // /*!
     //   \param[in] t the time at which to compute the incremental cost value
@@ -94,7 +94,7 @@ namespace sac {
       x_des = [this](const double & /*t*/,const state_type & /*x*/,
 		     vec_type & xdes) { xdes.Zero(this->xlen_,1); };
       proj = [](state_type & /*x*/) { };
-      dproj = [](const state_type & /*x*/, mat_type & /*dproj_x*/) { };
+      gproj = [](const state_type & /*x*/, mat_type & /*dproj_x*/) { };
       
       // inc_x_cost = [this](const double & t, const state_type & x) {
       // 	static vec_type mxdes(this->xlen_,1);

@@ -14,7 +14,7 @@ namespace sac {
     double t0_, tf_;
     size_t J1steps_;
     vec_type mx_tf_;
-    mat_type mdproj_x_tf_;
+    mat_type mgproj_x_tf_;
     Params & p_;
   
   public:
@@ -31,7 +31,7 @@ namespace sac {
     cost( state_intp & x_intp, Params & p ) 
       : J1_(1), x_tf_( p.xlen() ), t0_( 0.0 ), tf_( 0.0 ), 
 	J1steps_(0), mx_tf_(p.xlen(),1), 
-	mdproj_x_tf_( mat_type::Identity(p.xlen(),p.xlen()) ), 
+	mgproj_x_tf_( mat_type::Identity(p.xlen(),p.xlen()) ), 
 	p_(p), 	m_lofx( x_intp, p ), m_x_intp( x_intp ) { }
 
     /*! 
@@ -64,17 +64,17 @@ namespace sac {
       t0_ = m_lofx.begin();
       tf_ = m_lofx.end();
       m_x_intp( tf_, x_tf_ );
-      //! \todo: Alex: double check the order of proj and dproj calls
-      p_.dproj( x_tf_, mdproj_x_tf_ );
+      //! \todo: Alex: double check the order of proj and gproj calls
+      p_.gproj( x_tf_, mgproj_x_tf_ );
       p_.proj( x_tf_ );
       //
       State2Mat( x_tf_, mx_tf_ );
-      // Gmofx = mdproj_x_tf_*p_.P()*(mx_tf_-p_.mxdes_tf());
+      // Gmofx = mgproj_x_tf_*p_.P()*(mx_tf_-p_.mxdes_tf());
 
       //
       p_.x_des( tf_, x_tf_, p_.mxdes_tf() ); // Get desired trajectory point
       //
-      Gmofx = mdproj_x_tf_*p_.P()*(mx_tf_-p_.mxdes_tf());
+      Gmofx = (mgproj_x_tf_ /*-Gxdes(x_tf_[0], x_tf_[2])*/)*p_.P()*(mx_tf_-p_.mxdes_tf());
     }
   
     /*!

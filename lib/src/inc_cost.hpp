@@ -12,7 +12,7 @@ namespace sac {
   */
   class inc_cost {
     vec_type mx_;
-    mat_type mdproj_x_;
+    mat_type mgproj_x_;
     Params & p_;
   
   public:
@@ -29,7 +29,7 @@ namespace sac {
     */
     inc_cost( state_intp & x_intp, Params & p )
       : mx_(vec_type::Zero(p.xlen(),1)), 
-	mdproj_x_( mat_type::Identity(p.xlen(),p.xlen()) ),
+	mgproj_x_( mat_type::Identity(p.xlen(),p.xlen()) ),
 	p_(p), m_x_intp( x_intp ), m_x( p.xlen() ),
 	m_mxdes( vec_type::Zero(p.xlen(),1) ) { }
   
@@ -65,11 +65,11 @@ namespace sac {
     inline void grad( const double t, const vec_type &mx,
 		      vec_type &Glofx ) { 
       Mat2State( mx, m_x);
-      p_.dproj( m_x, mdproj_x_ );
+      p_.gproj( m_x, mgproj_x_ );
       //
       p_.x_des( t, m_x, m_mxdes ); // Get desired trajectory point
       //
-      Glofx = mdproj_x_*p_.Q()*(mx-m_mxdes);
+      Glofx = mgproj_x_*p_.Q()*(mx-m_mxdes);
 
       // p_.dinc_x_cost( t, mx, dldx );
     }
