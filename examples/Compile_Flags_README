@@ -15,3 +15,48 @@ For PRODUCTION compile with these flags:
 
 Other useful OPTIONS:
 >> EIGEN_INITIALIZE_MATRICES_BY_ZERO
+
+----------------------------------------------------------------------------
+
+Jarvis's Makefile Recommendations:
+
+I'm attaching a copy of my slightly modified Makefile. My changes are simple, I added the OBJS and HEADERDEPS variables, and then compile in two stages -- first building objects then building an executable. This allowed me to build the $(PROJ).d file that contains the headers that the $(PROJ).o depends on (using gcc's MM and MF switches). Then I can use Make's "include" command to depend on all of the correct headers. More about this can be read on the first two answers to this stack overflow question: http://stackoverflow.com/questions/2394609/makefile-header-dependencies.
+
+CC = gcc
+CPP = g++
+PROJ = winchbot
+OBJS = $(PROJ).o
+DEPS = $(PROJ).cpp
+USERDIR = ./user
+HEADERDEPS := $(OBJS:.o=.d)
+
+# Require SAC_PATH environment variable to lib dir
+LIBDIR = /home/jarvis/sacws/src/sactrep/saclib/lib/src/
+
+# Prefer static libs to dynamic
+LIBS = -Wl,-Bstatic \
+	-lboost_system -lboost_timer -lboost_chrono -lrt -Wl,-Bdynamic
+CFLAGS = -I/usr/include/eigen3/ -I$(USERDIR) -I$(LIBDIR)
+CFLAGS += -std=c++11
+
+
+# Default code optimization level
+OPT = -O2
+
+all: $(PROJ)
+
+# Debug build with extra warning turned on and optimization off
+debug: OPT = -O0 -g -m64
+debug: CFLAGS += -Wall -Wextra -std=c++11
+debug: $(PROJ)
+
+$(PROJ): $(OBJS)
+	$(CPP) $(CFLAGS) $^ -o $@ $(OPT) $(LIBS)
+
+%.o : %.cpp
+	$(CC) -c -MMD -MP $< -o $@ $(CFLAGS)
+
+-include $(HEADERDEPS)
+
+clean:
+	rm -f $(OBJS) $(PROJ) $(HEADERDEPS)

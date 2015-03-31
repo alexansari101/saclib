@@ -66,8 +66,8 @@ int main(int /* argc */ , char** /* argv */ )
     params.u2search() = true; // true
     params.Q() = mat_type::Zero(4,4);
     params.P() = mat_type::Zero(4,4);
-    params.Q()(1,1) = 1; params.Q()(3,3) = 5;
-    params.P()(1,1) = 15; params.P()(3,3) = 10; // 1,10 ; 5,10 ; 15, 10;
+    params.Q()(1,1) = 5; params.Q()(3,3) = 10;
+    // params.P()(1,1) = 15; params.P()(3,3) = 10; // 1,10 ; 5,10 ; 15, 10;
     params.R() << 0.1;
     params.proj = []( state_type & x ) { AngleWrap( x[0] ); 
 					 AngleWrap( x[2] ); };
