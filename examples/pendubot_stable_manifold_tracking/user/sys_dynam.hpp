@@ -43,29 +43,93 @@ namespace sac {
   //]
 
 
-double s1_intp(double th1, double th2) {
-  static auto s1 = get_csv( "sth1dot.csv" );
-  static auto s2 = get_csv( "sth2dot.csv" );
-  static double dth = 0.10755;
-  static double min_th = -3.38782;
-  AngleWrap( th1 ); AngleWrap( th2 );
-  size_t xindx = round( (th2 - min_th)/dth );
-  size_t yindx = round( (th1 - min_th)/dth );
-      
-  return s1[xindx][yindx];
-}
+  double get_s1(double th1, double th2) {
+    static auto s1 = get_csv( "sth1dot.csv" );
+    static double dth = 0.10755;
+    static double min_th = -3.38782;
+    AngleWrap( th1 ); AngleWrap( th2 );
+    // Alt 1:
+    size_t xindx = round( (th2 - min_th)/dth );
+    size_t yindx = round( (th1 - min_th)/dth );
+    return s1[xindx][yindx];    
+    //
+    // Alt 2:
+    // static double frac2, frac1, intpart2, intpart1;
+    // static size_t xindx_m, xindx_p, yindx_m, yindx_p;
+    // frac2 = modf((th2 - min_th)/dth, &intpart2);
+    // frac1 = modf((th1 - min_th)/dth, &intpart1);
+    // xindx_m=intpart2; xindx_p=xindx_m+1;
+    // yindx_m=intpart1; yindx_p=yindx_m+1;
+    // if (xindx_p > 64 || xindx_m < 0 || yindx_p > 64 || yindx_m < 0 )
+    //   return s1[round( (th2 - min_th)/dth )][round( (th1 - min_th)/dth )];
+    // else {
+    //   return s1[xindx_m][yindx_m]*(1-frac2)*(1-frac1)
+    // 	+s1[xindx_p][yindx_m]*frac2*(1-frac1)
+    // 	+s1[xindx_m][yindx_p]*(1-frac2)*frac1
+    // 	+s1[xindx_p][yindx_p]*frac2*frac1;
+    // }
+  }
 
-double s2_intp(double th1, double th2) {
-  static auto s1 = get_csv( "sth1dot.csv" );
-  static auto s2 = get_csv( "sth2dot.csv" );
-  static double dth = 0.10755;
-  static double min_th = -3.38782;
-  AngleWrap( th1 ); AngleWrap( th2 );
-  size_t xindx = round( (th2 - min_th)/dth );
-  size_t yindx = round( (th1 - min_th)/dth );
+  double get_s2(double th1, double th2) {
+    static auto s2 = get_csv( "sth2dot.csv" );
+    static double dth = 0.10755;
+    static double min_th = -3.38782;
+    AngleWrap( th1 ); AngleWrap( th2 );
+    // Alt 1:
+    size_t xindx = round( (th2 - min_th)/dth );
+    size_t yindx = round( (th1 - min_th)/dth );
+    return s2[xindx][yindx];    
+    //
+    // Alt 2:
+    // static double frac2, frac1, intpart2, intpart1;
+    // static size_t xindx_m, xindx_p, yindx_m, yindx_p;
+    // frac2 = modf((th2 - min_th)/dth, &intpart2);
+    // frac1 = modf((th1 - min_th)/dth, &intpart1);
+    // xindx_m=intpart2; xindx_p=xindx_m+1;
+    // yindx_m=intpart1; yindx_p=yindx_m+1;
+    // if (xindx_p > 64 || xindx_m < 0 || yindx_p > 64 || yindx_m < 0 )
+    //   return s2[round( (th2 - min_th)/dth )][round( (th1 - min_th)/dth )];
+    // else {
+    //   return s2[xindx_m][yindx_m]*(1-frac2)*(1-frac1)
+    // 	+s2[xindx_p][yindx_m]*frac2*(1-frac1)
+    // 	+s2[xindx_m][yindx_p]*(1-frac2)*frac1
+    // 	+s2[xindx_p][yindx_p]*frac2*frac1;
+    // }
+     
+  }
+
+  double s1_intp(double th1, double th2) {    
+    return get_s1(th1,th2);
+  }
+
+  double s2_intp(double th1, double th2) {    
+    return get_s2(th1,th2);
+  }
+  
+
+// double s1_intp(double th1, double th2) {
+//   static auto s1 = get_csv( "sth1dot.csv" );
+//   static auto s2 = get_csv( "sth2dot.csv" );
+//   static double dth = 0.10755;
+//   static double min_th = -3.38782;
+//   AngleWrap( th1 ); AngleWrap( th2 );
+//   size_t xindx = round( (th2 - min_th)/dth );
+//   size_t yindx = round( (th1 - min_th)/dth );
       
-  return s2[xindx][yindx];
-}
+//   return s1[xindx][yindx];
+// }
+
+// double s2_intp(double th1, double th2) {
+//   static auto s1 = get_csv( "sth1dot.csv" );
+//   static auto s2 = get_csv( "sth2dot.csv" );
+//   static double dth = 0.10755;
+//   static double min_th = -3.38782;
+//   AngleWrap( th1 ); AngleWrap( th2 );
+//   size_t xindx = round( (th2 - min_th)/dth );
+//   size_t yindx = round( (th1 - min_th)/dth );
+      
+//   return s2[xindx][yindx];
+// }
 
 /* 
    Note:
@@ -83,7 +147,7 @@ mat_type Gxdes(double th1, double th2) {
   // gsdth2
   gxdesdx(2,1) = (s1_intp(th1,th2+dth)-s1_intp(th1,th2-dth))/(2.0*dth);
   gxdesdx(2,3) = (s2_intp(th1,th2+dth)-s2_intp(th1,th2-dth))/(2.0*dth);
-  //
+  
   return gxdesdx;
 }
 

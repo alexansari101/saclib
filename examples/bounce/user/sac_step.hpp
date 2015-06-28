@@ -161,7 +161,8 @@ namespace sac {
 	/* apply reset map to rho */
 	static state_type s_f_minus(x0.size()), s_f_plus(x0.size()),
 	  s_x_minus(x0.size()), s_x_plus(x0.size());
-	static vec_type v_f_minus(4,1), v_f_plus(4,1), v_rho_plus(4,1);
+	static vec_type v_f_minus(x0.size(),1), v_f_plus(x0.size(),1), 
+	  v_rho_plus(x0.size(),1);
 	// get x(t_event^-) and x(t_event^+)
 	x_intp( *(events.rbegin()+1), s_x_minus );
 	x_intp( *(events.rbegin()+1)+1E-7, s_x_plus );
@@ -179,7 +180,7 @@ namespace sac {
 	Mat2State( v_rho_plus, rho_ );
 
     	events.pop_back();
-      } // end for
+      } // end while
 
       /* last event in list */
       steps_ = simRho( rho_dot_, rho_, t0, events.back(), 

@@ -23,12 +23,11 @@ int main(int /* argc */ , char** /* argv */ )
 
     /* initialize SAC parameters */
     Params params(4,2);
-    params.T() = 0.5;
+    params.T() = 0.5; // 0.5; 0.75
     params.lam() = -10;
     params.maxdt() = 0.2;
     params.ts() = 0.01;
     params.usat() = { {10, -10}, {0, -10} };
-    // params.usat() = { {0, -0}, {0, -0} };
     params.calc_tm() = params.ts();
     params.u2search() = false;
     params.Q() = mat_type::Zero(4,4);

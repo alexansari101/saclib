@@ -3,6 +3,88 @@
 
 namespace sac {
 
+  /* FOR NEGATIVELY SLOPED FLOOR EXAMPLES */
+  // double s = -1.0/5.0; // negative floor slope
+
+  // //[ guard equations
+  // double Phiq1q1( const state_type &x ) { return x[1] - s*x[0]; }
+
+  // mat_type DPhiq1q1( const state_type &x ) { 
+  //   mat_type DPhi = mat_type::Zero(1,4);
+  //   DPhi(0,0) = -s;
+  //   DPhi(0,1) = 1.0;
+  //   return DPhi; 
+  // }
+  // //]
+
+  // //[ reset maps
+  // state_type Omegaq1q1( const state_type &x ) { 
+  //   state_type Omega = x;
+  //   Omega[2] = ( x[2] + s*x[3] + pow(pow(s,2.0)*pow(-s*x[2]+x[3],2.0),0.5) )
+  //     /( 1 + pow(s,2.0) );
+  //   Omega[3] = ( pow(s,2.0)*x[2] + pow(s,3.0)*x[3] - 
+  // 		 pow( pow(s,2.0)*pow(-s*x[2]+x[3],2.0) ,0.5) )
+  //     /( s + pow(s,3.0) );
+  //   return Omega; 
+  // }
+  
+  // mat_type DOmegaq1q1( const state_type &x ) { 
+  //   mat_type DOmega = mat_type::Identity(4,4);
+  //   double c1 = (s*x[2]-x[3]);
+  //   double sqrt = pow( pow(s,2.0)*pow(-c1,2.0) ,0.5);
+  //   double denom1 = 1+pow(s,2.0);
+  //   double denom2 = s+pow(s,3.0);
+  //   //
+  //   DOmega(2,2) = ( 1.0 + (pow(s,3.0)*c1)/sqrt ) / denom1;
+  //   DOmega(2,3) = ( s + sqrt/(-c1) )/ denom1;
+  //   //
+  //   DOmega(3,2) = ( pow(s,2.0) + (pow(s,3.0)*(-c1))/sqrt ) / denom2;
+  //   DOmega(3,3) = ( pow(s,3.0) + sqrt/c1 )/ denom2;
+  //   //
+  //   return DOmega; 
+  // }
+
+  /* FOR SINUSOIDAL FLOOR EXAMPLE */
+  // //[ guard equations
+  // double Phiq1q1( const state_type &x ) { return x[1] - 0.3*cos(8*x[0]); }
+
+  // mat_type DPhiq1q1( const state_type &x ) { 
+  //   mat_type DPhi = mat_type::Zero(1,4);
+  //   DPhi(0,0) = 2.4*sin(8.0*x[0]);
+  //   DPhi(0,1) = 1.0;
+  //   return DPhi; 
+  // }
+  // //]
+
+  // //[ reset maps
+  // state_type Omegaq1q1( const state_type &x ) { 
+  //   state_type Omega = x;
+  //   Omega[2] = ((47.0 - 72.0*cos(16.0*x[0]))*x[2] + 120.0*sin(8.0*x[0])*x[3])
+  //     /(-97.0 + 72.0*cos(16.0*x[0]));
+  //   Omega[3] = (120.0*sin(8.0*x[0])*x[2] + (-47.0 + 72.0*cos(16.0*x[0]))*x[3])
+  //     /(-97.0 + 72.0*cos(16.0*x[0]));
+  //   return Omega; 
+  // }
+  
+  // mat_type DOmegaq1q1( const state_type &x ) { 
+  //   mat_type DOmega = mat_type::Identity(4,4);
+  //   //
+  //   DOmega(2,0) = -((960.0*cos(8.0*x[0])*(120.0*sin(8.0*x[0])*x[2] +
+  // 					  (-47.0 + 72.0*cos(16.0*x[0]))*x[3]))
+  // 		    / pow((97.0 - 72.0*cos(16.0*x[0])),2));
+  //   DOmega(2,2) = -1.0 + 50.0/(97.0 - 72.0*cos(16.0*x[0]));
+  //   DOmega(2,3) = (120.0*sin(8.0*x[0]))/(-97.0 + 72.0*cos(16.0*x[0]));
+  //   //
+  //   DOmega(3,0) = (960.0*((11.0*cos(8.0*x[0]) - 36.0*cos(24.0*x[0]))*x[2] + 
+  // 			  60.0*sin(16.0*x[0])*x[3]))
+  //     /pow( (97.0 - 72.0*cos(16.0*x[0])) ,2);
+  //   DOmega(3,2) = (120.0*sin(8.0*x[0]))/(-97.0 + 72.0*cos(16.0*x[0]));
+  //   DOmega(3,3) = 1.0 + 50.0/(-97.0 + 72.0*cos(16.0*x[0]));
+  //   //
+  //   return DOmega; 
+  // }
+  
+  /* FOR SIMPLE BOUNCING BALL EXAMPLE */
   //[ guard equations
   double Phiq1q1( const state_type &x ) { return x[1]; }
 
@@ -27,7 +109,7 @@ namespace sac {
   }
   
   mat_type Piq1q1( const state_type &x_minus, const vec_type &f_minus,
-		   const vec_type &f_plus ) { 
+  		   const vec_type &f_plus ) { 
 
     mat_type Pi = mat_type::Identity(4,4);
     mat_type tmp = mat_type::Zero(1,4);

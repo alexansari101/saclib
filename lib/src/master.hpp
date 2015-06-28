@@ -147,26 +147,26 @@ namespace sac {
 
   /*!
     Converts a state_type vector to a vector_type.
-    \param[in] s A state_type vector.
-    \param[out] matOut A matrix with the same # of rows as the input vector.
+    \param[in] s A state_type vector with the same # of rows as the output.
+    \param[out] matOut A row/col vector.
   */
   template< class T >
   inline void State2Mat( const state_type & s, T & matOut ) {
     for ( size_t i=0; i<s.size(); i++ ) {
-      matOut(i,0) = s[i];
+      matOut(i) = s[i];
     }
   }
 
   /*!
     Converts a vector_type to a state_type.
-    \param[in] mat A column vector.
-    \param[out] sOut A state_type vector with the same # of rows as the 
+    \param[in] mat A row/column vector.
+    \param[out] sOut A state_type vector with the same # of elements as the 
     input matrix.
   */
   template< class T >
   inline void Mat2State( const T & mat, state_type & sOut ) {
     for ( size_t i=0; i<mat.rows(); i++ ) {
-      sOut[i] = mat(i,0);
+      sOut[i] = mat(i);
     }
   }
 

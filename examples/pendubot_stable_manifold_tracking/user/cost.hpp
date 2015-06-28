@@ -120,10 +120,13 @@ namespace sac {
     typedef runge_kutta_dopri5< state_type > stepper_type;
     
     double eps = 1E-7;
-    size_t J1_steps = integrate_adaptive( make_controlled( p_.eps_cost( ) , 
-							   p_.eps_cost( ) , 
-							   stepper_type( ) ) , 
-					  m_lofx , term_cost , t0_ , tf_-eps , 0.01 );
+    // size_t J1_steps = integrate_adaptive( make_controlled( p_.eps_cost( ) , 
+    // 							   p_.eps_cost( ) , 
+    // 							   stepper_type( ) ) , 
+    // 					  m_lofx , term_cost , t0_ , tf_-eps , 0.01 );
+    size_t J1_steps = integrate_adaptive( stepper_type( ) , 
+					  m_lofx , term_cost , t0_ , 
+					  tf_-eps , 0.005 );
 
     return J1_steps;
   }
