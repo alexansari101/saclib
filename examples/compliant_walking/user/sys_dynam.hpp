@@ -390,7 +390,7 @@ namespace sac {
       Cl_ = Cl(x);
       //
       dxdt[0] = x[1];
-      dxdt[1] = Cl_*(x[0]-x[4]) / m; //+ u_curr_[1];
+      dxdt[1] = Cl_*(x[0]-x[4]) / m + u_curr_[1];
       dxdt[2] = x[3];
       dxdt[3] = ( Cl_*(x[2]/*-zGrnd(x[4])*/) - m*9.81 ) / m;  
       dxdt[4] = 0;
@@ -403,7 +403,7 @@ namespace sac {
       Cl_ = Cl(x); Cr_ = Cr(x);
       //
       dxdt[0] = x[1];
-      dxdt[1] = ( Cl_*(x[0]-x[4]) - Cr_*(x[5]-x[0]) )/m; //+ u_curr_[1];
+      dxdt[1] = ( Cl_*(x[0]-x[4]) - Cr_*(x[5]-x[0]) )/m + u_curr_[1];
       dxdt[2] = x[3];
       dxdt[3] = ( Cl_*(x[2]/*-zGrnd(x[4])*/) + Cr_*(x[2]/*-zGrnd(x[5])*/) 
 		  - m*9.81 )/m;
@@ -417,7 +417,7 @@ namespace sac {
       Cr_ = Cr(x);
       //
       dxdt[0] = x[1];
-      dxdt[1] = -Cr_*(x[5]-x[0])/m; // + u_curr_[1];
+      dxdt[1] = -Cr_*(x[5]-x[0])/m + u_curr_[1];
       dxdt[2] = x[3];
       dxdt[3] = ( Cr_*(x[2]/*-zGrnd(x[5])*/) - m*9.81 ) / m;  
       dxdt[4] = 0;

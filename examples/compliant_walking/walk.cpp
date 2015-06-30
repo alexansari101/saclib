@@ -92,20 +92,20 @@ int main(int /* argc */ , char** /* argv */ )
     boost::timer::auto_cpu_timer t(4, "%w seconds\n");
 
     /* initialize SAC parameters */
-    Params params(8,1);
-    params.T() = 1; // 2
+    Params params(8,2);
+    params.T() = 1;
     params.lam() = -10;
     params.maxdt() = 0.2;
     params.ts() = 0.01;
-    params.usat() = { {0.1, -0.1} };  // { {0.1, -0.1} }; { {1, -1} };
+    params.usat() = { {0.1, -0.1}, {1, -1} };
     params.calc_tm() = params.ts();
     params.u2search() = false;
     params.Q() = mat_type::Zero(params.xlen(),params.xlen());
     params.P() = mat_type::Zero(params.xlen(),params.xlen());
     params.R() = mat_type::Identity(params.ulen(),params.ulen());
-    params.Q()(1,1) = 100; // params.Q()(6,6) = 10;
+    params.Q()(1,1) = 100;
     params.x_des = []( const double & /*t*/, const state_type & /*x*/,
-    		       vec_type & xdes) { xdes << 0, 2, 0, 0, 
+    		       vec_type & xdes) { xdes << 0, 1.2, 0, 0, 
     					  0, 0, 69.0*PI/180.0, 0; };
 
     /* initialize SAC stepper */
@@ -115,8 +115,8 @@ int main(int /* argc */ , char** /* argv */ )
     double t0=0.0, tsim = 10;
     
     /* initial state and control */
-    state_type x0(params.xlen());    x0 = { 0, 1.15 /* .883 for Es = 816J */, 
-    					    1, 0, 0, 0, 69*PI/180.0, 0 };
+    state_type x0(params.xlen());    x0 = { 0, 0 /* .883 for Es = 816J */, 
+    					    1-.056, 0, 0, 0, 69*PI/180.0, 0 };
     b_control u1(params);     u1.stimes( 0, params.calc_tm() );
 
     /* compute final trajectory cost */
@@ -157,23 +157,12 @@ int main(int /* argc */ , char** /* argv */ )
     J_traj.print();
     //]    
 
-    //[ TESTING
+    //[ Terminal State
     cout << "x0: ";
     for (auto &i : x0)
       cout << i << ", ";
     cout << "\n";
     /**/
-    // x0 = { 0, .883 /* for Es = 816J */, 
-    // 	   1, 0, 0, 0, 76.0*PI/180.0, 0 };
-    // sys_dynam xdot(u1);
-    // std::vector<double> events;
-    // simHybX( xdot, x0, 0, tsim+params.ts(), x_out, state_times, events );
-    // /**/
-    // cout << "x0: ";
-    // for (auto &i : x0)
-    //   cout << i << ", ";
-    // cout << "\n";
-    //]
   
     return 0;
 }

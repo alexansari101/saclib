@@ -49,6 +49,7 @@ namespace sac {
       Bmat.resize(x.size(),u.size());
       Bmat.setZero();
       Bmat(6,0) = 1;
+      Bmat(1,1) = 1;
     }
     
     // Left leg single support:
