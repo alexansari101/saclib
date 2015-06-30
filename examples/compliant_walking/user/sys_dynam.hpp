@@ -296,7 +296,8 @@ namespace sac {
 	    //
 	    switch ( (int) (x[7]+0.5) /* curr location */ ) {
 	    case 0:
-	      throw std::make_pair(t,1.0); // t_i^+ and location q_{i+1}=1
+	      if ( x[3] < 0 )
+		throw std::make_pair(t,1.0); // t_i^+ and location q_{i+1}=1
 	      break;
 	    case 1:
 	      if (i == 0 )
@@ -307,7 +308,8 @@ namespace sac {
 		std::cout << "unknown location q_{i+1}\n";
 	      break;
 	    case 2:
-	      throw std::make_pair(t,1.0); // t_i^+ and location q_{i+1}=1
+	      if ( x[3] < 0 )
+		throw std::make_pair(t,1.0); // t_i^+ and location q_{i+1}=1
 	      break;
 	    default:
 	      std::cout << "Location #" << (int)(x[7]+0.5) 
@@ -388,7 +390,7 @@ namespace sac {
       Cl_ = Cl(x);
       //
       dxdt[0] = x[1];
-      dxdt[1] = Cl_*(x[0]-x[4]) / m;
+      dxdt[1] = Cl_*(x[0]-x[4]) / m; //+ u_curr_[1];
       dxdt[2] = x[3];
       dxdt[3] = ( Cl_*(x[2]/*-zGrnd(x[4])*/) - m*9.81 ) / m;  
       dxdt[4] = 0;
@@ -401,7 +403,7 @@ namespace sac {
       Cl_ = Cl(x); Cr_ = Cr(x);
       //
       dxdt[0] = x[1];
-      dxdt[1] = ( Cl_*(x[0]-x[4]) - Cr_*(x[5]-x[0]) )/m;
+      dxdt[1] = ( Cl_*(x[0]-x[4]) - Cr_*(x[5]-x[0]) )/m; //+ u_curr_[1];
       dxdt[2] = x[3];
       dxdt[3] = ( Cl_*(x[2]/*-zGrnd(x[4])*/) + Cr_*(x[2]/*-zGrnd(x[5])*/) 
 		  - m*9.81 )/m;
@@ -415,7 +417,7 @@ namespace sac {
       Cr_ = Cr(x);
       //
       dxdt[0] = x[1];
-      dxdt[1] = -Cr_*(x[5]-x[0])/m;
+      dxdt[1] = -Cr_*(x[5]-x[0])/m; // + u_curr_[1];
       dxdt[2] = x[3];
       dxdt[3] = ( Cr_*(x[2]/*-zGrnd(x[5])*/) - m*9.81 ) / m;  
       dxdt[4] = 0;
