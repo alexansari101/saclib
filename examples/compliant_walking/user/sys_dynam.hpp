@@ -82,6 +82,16 @@ namespace sac {
   double Phiq1q2( const state_type &x ){return x[2]/*-zGrnd(x)*/-L0*sin(x[6]);}
   /* right take off: double support to left single support */
   double Phiq0q1( const state_type &x ) { return Lr(x) - L0; }
+  /**/
+  /* left take off: left single support to aerial */
+  double Phiq3q0( const state_type &x ) { return Ll(x) - L0; }
+  /* right take off: right single support to aerial */
+  double Phiq3q2( const state_type &x ) { return Lr(x) - L0; }
+  /* left touch down: aerial to left single support */
+  double Phiq0q3( const state_type &x ){return x[2]/*-zGrnd(x)*/-L0*sin(x[6]);}
+  /* right touch down: aerial to right single support */
+  double Phiq2q3( const state_type &x ){return x[2]/*-zGrnd(x)*/-L0*sin(x[6]);}
+  /**/
   //
   /* Return a vector of the value of each guard in the current location */
   state_type Phi(const state_type &x ) { 
@@ -92,6 +102,7 @@ namespace sac {
     switch ( loc ) {
     case 0:
       phiq[0] = Phiq1q0( x );
+      phiq.push_back( Phiq3q0( x ) );
       return phiq;
     case 1:
       phiq[0] = Phiq2q1( x );
@@ -99,6 +110,11 @@ namespace sac {
       return phiq;
     case 2:
       phiq[0] = Phiq1q2( x );
+      phiq.push_back( Phiq3q2( x ) );
+      return phiq;
+    case 3:
+      phiq[0] = Phiq0q3( x );
+      phiq.push_back( Phiq2q3( x ) );
       return phiq;
     default:
       std::cout << "Location #" << loc << " has not been defined\n";
@@ -115,7 +131,13 @@ namespace sac {
     //
     switch ( loc ) {
     case 0:
-      return Phiq1q0( x );
+      if (loc_plus == 1)
+	return Phiq1q0( x );
+      else if (loc_plus == 3)
+        return Phiq3q0( x );
+      else { std::cout << "Location #" << loc_plus 
+		       << " has not been defined for location at t^+\n"; 
+        return -1; }
     case 1:
       if (loc_plus == 0)
 	return Phiq0q1( x );
@@ -125,7 +147,21 @@ namespace sac {
 		       << " has not been defined for location at t^+\n";
 	return -1; }
     case 2:
-      return Phiq1q2( x );
+      if (loc_plus == 1)
+	return Phiq1q2( x );
+      else if (loc_plus == 3)
+        return Phiq3q2( x );
+      else { std::cout << "Location #" << loc_plus 
+		       << " has not been defined for location at t^+\n";
+	return -1; }
+    case 3:
+      if (loc_plus == 0)
+	return Phiq0q3( x );
+      else if ( loc_plus == 2 )
+      	return Phiq2q3( x );
+      else { std::cout << "Location #" << loc_plus 
+		       << " has not been defined for location at t^+\n";
+      	return -1; }
     default:
       std::cout << "Location #" << loc << " has not been defined\n";
       return -1;
@@ -160,6 +196,34 @@ namespace sac {
     }
     return dPhi;
   }
+  /**/
+  mat_type DPhiq3q0( const state_type &x ) { 
+    mat_type dPhi = mat_type::Zero(1,8);
+    static state_type dLldx(8); dLldx = DLl(x);
+    for (size_t i=0; i<x.size(); i++) {
+      dPhi(0,i) = dLldx[i];
+    }
+    return dPhi;
+  }
+  mat_type DPhiq3q2( const state_type &x ) { 
+    mat_type dPhi = mat_type::Zero(1,8);
+    static state_type dLrdx(8); dLrdx = DLr(x);
+    for (size_t i=0; i<x.size(); i++) {
+      dPhi(0,i) = dLrdx[i];
+    }
+    return dPhi;
+  }
+  mat_type DPhiq0q3( const state_type &x ) { 
+    mat_type dPhi = mat_type::Zero(1,8);
+    dPhi(0,2) = 1;    dPhi(0,6) = -L0*cos(x[6]);
+    return dPhi /*- DzGrnd(x)*/;
+  }
+  mat_type DPhiq2q3( const state_type &x ) { 
+    mat_type dPhi = mat_type::Zero(1,8);
+    dPhi(0,2) = 1;    dPhi(0,6) = -L0*cos(x[6]);
+    return dPhi /*- DzGrnd(x)*/;
+  }
+  /**/
   /* Return the derivative the guard that transitions between 2 locations */
   mat_type DPhi(const state_type &x, const double loc_tplus ) {
     static int loc;
@@ -169,7 +233,13 @@ namespace sac {
     //
     switch ( loc ) {
     case 0:
-      return DPhiq1q0( x );
+      if ( loc_plus == 1 )
+	return DPhiq1q0( x );
+      else if (loc_plus == 3)
+        return DPhiq3q0( x );
+      else { std::cout << "Location #" << loc_plus 
+		       << " has not been defined for location at t^+\n";
+	return mat_type::Zero(1,8); }
     case 1:
       if (loc_plus == 0)
 	return DPhiq0q1( x );
@@ -179,7 +249,21 @@ namespace sac {
 		       << " has not been defined for location at t^+\n";
 	return mat_type::Zero(1,8); }
     case 2:
-      return DPhiq1q2( x );
+      if ( loc_plus == 1 )
+	return DPhiq1q2( x );
+      else if (loc_plus == 3)
+        return DPhiq3q2( x );
+      else { std::cout << "Location #" << loc_plus 
+      	       << " has not been defined for location at t^+\n";
+	return mat_type::Zero(1,8); }
+    case 3:
+      if (loc_plus == 0)
+	return DPhiq0q3( x );
+      else if ( loc_plus == 2 )
+	return DPhiq2q3( x );
+      else { std::cout << "Location #" << loc_plus 
+		       << " has not been defined for location at t^+\n";
+	return mat_type::Zero(1,8); }
     default:
       std::cout << "Location #" << loc << " has not been defined\n";
       return mat_type::Zero(1,8);
@@ -208,9 +292,12 @@ namespace sac {
       else {
 	omega[4] = x[0] - L0*cos(x[6]); }
       return omega;
+    case 3:
+      return omega;
     default:
       std::cout << "Location #" << (int) (x[7]+0.5) 
 		<< " has not been defined\n";
+      return omega;
     }
     // 
   }  
@@ -237,8 +324,11 @@ namespace sac {
       else {
 	dOmega(4,0) = 1; dOmega(5,6) = L0*sin(x[6]); }
       return dOmega;
+    case 3:
+      return dOmega;
     default:
       std::cout << "Location #" << loc << " has not been defined\n";
+      return dOmega;
     }
     // 
   }
@@ -296,8 +386,10 @@ namespace sac {
 	    //
 	    switch ( (int) (x[7]+0.5) /* curr location */ ) {
 	    case 0:
-	      if ( x[3] < 0 )
+	      if ( x[3] < 0 && i == 0 )
 		throw std::make_pair(t,1.0); // t_i^+ and location q_{i+1}=1
+	      else if (i == 1)
+	      	throw std::make_pair(t,3.0); // t_i^+ and location q_{i+1}=3
 	      break;
 	    case 1:
 	      if (i == 0 )
@@ -305,11 +397,21 @@ namespace sac {
 	      else if (i == 1)
 		throw std::make_pair(t,0.0); // t_i^+ and location q_{i+1}=0
 	      else
-		std::cout << "unknown location q_{i+1}\n";
+		std::cout << "case 1 unknown location q_{i+1}\n";
 	      break;
 	    case 2:
-	      if ( x[3] < 0 )
+	      if ( x[3] < 0 && i == 0 )
 		throw std::make_pair(t,1.0); // t_i^+ and location q_{i+1}=1
+	      else if (i == 1)
+	      	throw std::make_pair(t,3.0); // t_i^+ and location q_{i+1}=3
+	      break;
+	    case 3:
+	      if ( (x[5] > x[4] && x[1] > 0 ) || (x[5] < x[4] && x[1] < 0 ) )
+	    	throw std::make_pair(t,0.0); // t_i^+ and location q_{i+1}=0
+	      else if ((x[4] > x[5] && x[1] > 0) || (x[4] < x[5] && x[1] < 0))
+	      	throw std::make_pair(t,2.0); // t_i^+ and location q_{i+1}=2
+	      else
+	      	std::cout << "case 3 unknown location q_{i+1}\n";
 	      break;
 	    default:
 	      std::cout << "Location #" << (int)(x[7]+0.5) 
@@ -379,6 +481,9 @@ namespace sac {
       case 2:
 	fr(x, dxdt, t); // Right leg single support dynamics
 	break;
+      case 3:
+      	ff(x, dxdt, t); // flight dynamics
+      	break;
       default:
 	std::cout << "Location #" << loc_ << " has not been defined\n";
 	break;
@@ -425,11 +530,23 @@ namespace sac {
       dxdt[6] = u_curr_[0]; 
       dxdt[7] = 0;
     }
+    // flight dynamics:
+    void ff(const state_type &x, state_type &dxdt, const double /*t*/) {
+      dxdt[0] = x[1];
+      dxdt[1] = 0;
+      dxdt[2] = x[3];
+      dxdt[3] = -9.81;  
+      dxdt[4] = 0;
+      dxdt[5] = 0;
+      dxdt[6] = u_curr_[0]; 
+      dxdt[7] = 0;
+    }
   };
   //]
 
 
   //[
+  //! \todo Alex: Develop a more efficient search (e.g. Golden Sect., Grad.).
   //! \todo Alex: See about making inputs const type.
   /*!
     Simulates the state of a hybrid system forward in time from an initial 

@@ -97,15 +97,15 @@ int main(int /* argc */ , char** /* argv */ )
     params.lam() = -10;
     params.maxdt() = 0.2;
     params.ts() = 0.01;
-    params.usat() = { {0.1, -0.1}, {1, -1} };
+    params.usat() = { {.1, -.1}, {1, -1} };
     params.calc_tm() = params.ts();
     params.u2search() = false;
     params.Q() = mat_type::Zero(params.xlen(),params.xlen());
     params.P() = mat_type::Zero(params.xlen(),params.xlen());
     params.R() = mat_type::Identity(params.ulen(),params.ulen());
-    params.Q()(1,1) = 100;
+    params.Q()(1,1) = 100; // params.Q()(3,3) = 100;// params.Q()(2,2) = 100;
     params.x_des = []( const double & /*t*/, const state_type & /*x*/,
-    		       vec_type & xdes) { xdes << 0, 1.2, 0, 0, 
+    		       vec_type & xdes) { xdes << 0, 1.2, 1, 0, 
     					  0, 0, 69.0*PI/180.0, 0; };
 
     /* initialize SAC stepper */

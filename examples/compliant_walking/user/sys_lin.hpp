@@ -37,6 +37,9 @@ namespace sac {
       case 2:
 	Ar(x, u, Amat); // Right leg single support dynamics
 	break;
+      case 3:
+      	Af(x, u, Amat); // flight dynamics
+      	break;
       default:
 	std::cout << "Location #" << loc_ << " has not been defined\n";
 	break;
@@ -48,7 +51,8 @@ namespace sac {
 	    mat_type & Bmat ) {
       Bmat.resize(x.size(),u.size());
       Bmat.setZero();
-      Bmat(6,0) = 1;
+      if ( ((int) (x[7]+0.5)) < 3 )
+	Bmat(6,0) = 1;
       Bmat(1,1) = 1;
     }
     
@@ -120,6 +124,12 @@ namespace sac {
       //
     }
     
+    // Left leg single support:
+    void Af( const state_type & /*x*/, const state_type & /*u*/, 
+    	     mat_type & Amat ) {
+      Amat(0,1) = 1;
+      Amat(2,3) = 1;
+    }
 
   };
   //]
