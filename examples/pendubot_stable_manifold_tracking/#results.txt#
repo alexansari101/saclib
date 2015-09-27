@@ -1,0 +1,79 @@
+Testing over range: { {-0.2, 0.2, 0.1}, {-0.2, 0.2, 0.1} }
+
+Testing params:
+
+Q = 
+ 0  0  0  0
+ 0  5  0  0
+ 0  0  0  0
+ 0  0  0 10
+P = 
+ 0  0  0  0
+ 0  1  0  0
+ 0  0  0  0
+ 0  0  0 10
+R = 
+0.1
+T = 0.6
+lam = -15
+ts = 0.005
+calc_tm = 0.005
+u2search = 0
+usat = {7, -7}
+
+max allowed simulation time for convergence = 25
+testing x0 = (2.94159, 0, 2.94159, 0, )	dth1 = -0.2; dth2 = -0.2
+
+failed!!
+
+53.6445 seconds
+testing x0 = (2.94159, 0, 3.04159, 0, )	dth1 = -0.2; dth2 = -0.1
+
+failed!!
+
+55.1819 seconds
+testing x0 = (2.94159, 0, 3.14159, 0, )	dth1 = -0.2; dth2 = 0
+stabilizing at t = 8.66
+converged at t0 = 13.22
+21.4712 seconds
+testing x0 = (2.94159, 0, 3.24159, 0, )	dth1 = -0.2; dth2 = 0.1
+stabilizing at t = 2.12
+converged at t0 = 6.69
+4.8307 seconds
+testing x0 = (2.94159, 0, 3.34159, 0, )	dth1 = -0.2; dth2 = 0.2
+
+failed!!
+
+52.7446 seconds
+testing x0 = (3.04159, 0, 2.94159, 0, )	dth1 = -0.1; dth2 = -0.2
+
+failed!!
+
+53.3545 seconds
+testing x0 = (3.04159, 0, 3.04159, 0, )	dth1 = -0.1; dth2 = -0.1
+
+failed!!
+
+54.6089 seconds
+testing x0 = (3.04159, 0, 3.14159, 0, )	dth1 = -0.1; dth2 = 0
+stabilizing at t = 4.245
+converged at t0 = 8.5
+7.4684 seconds
+testing x0 = (3.04159, 0, 3.24159, 0, )	dth1 = -0.1; dth2 = 0.1
+
+failed!!
+
+53.4467 seconds
+testing x0 = (3.04159, 0, 3.34159, 0, )	dth1 = -0.1; dth2 = 0.2
+
+failed!!
+
+53.1161 seconds
+testing x0 = (3.14159, 0, 2.94159, 0, )	dth1 = 0; dth2 = -0.2
+stabilizing at t = 2.255
+converged at t0 = 6.385
+4.9387 seconds
+testing x0 = (3.14159, 0, 3.04159, 0, )	dth1 = 0; dth2 = -0.1
+stabilizing at t = 3.24
+converged at t0 = 7.785
+

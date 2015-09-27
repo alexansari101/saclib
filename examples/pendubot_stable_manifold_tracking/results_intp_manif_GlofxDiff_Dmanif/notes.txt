@@ -1,0 +1,2 @@
+backwards differencing in gradient of l() calculations
+dx for differencing should be specified in file names

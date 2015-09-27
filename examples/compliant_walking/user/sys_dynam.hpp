@@ -279,20 +279,36 @@ namespace sac {
     //
     switch ( (int) (x[7]+0.5) ) {
     case 0:
-      if ( x[1] >= 0 ) {
-	omega[5] = x[0] + L0*cos(x[6]); }
-      else {
-	omega[5] = x[0] - L0*cos(x[6]); }
+      if ( ((int) (loc_tplus + .05)) == 1) {
+	if ( x[1] >= 0 ) {
+	  omega[5] = x[0] + L0*cos(x[6]); }
+	else {
+	  omega[5] = x[0] - L0*cos(x[6]); }
+      }
       return omega;
     case 1:
       return omega;
     case 2:
-      if ( x[1] >= 0 ) {
-	omega[4] = x[0] + L0*cos(x[6]); }
-      else {
-	omega[4] = x[0] - L0*cos(x[6]); }
+      if ( ((int) (loc_tplus + .05)) == 1) {
+	if ( x[1] >= 0 ) {
+	  omega[4] = x[0] + L0*cos(x[6]); }
+	else {
+	  omega[4] = x[0] - L0*cos(x[6]); }
+      }
       return omega;
     case 3:
+      if ( ((int) (loc_tplus + .05)) == 0 ) {
+	if ( x[1] >= 0 ) {
+	  omega[4] = x[0] + L0*cos(x[6]); }
+	else { 
+	  omega[4] = x[0] - L0*cos(x[6]); }
+      }
+      else if ( ((int) (loc_tplus + .05)) == 2 ) {
+	if ( x[1] >= 0 ) {
+	  omega[5] = x[0] + L0*cos(x[6]); }
+	else { 
+	  omega[5] = x[0] - L0*cos(x[6]); }
+      }
       return omega;
     default:
       std::cout << "Location #" << (int) (x[7]+0.5) 
@@ -302,7 +318,7 @@ namespace sac {
     // 
   }  
   // derivative of state reset maps
-  mat_type DOmega( const state_type &x, const double /*loc_tplus*/ ) { 
+  mat_type DOmega( const state_type &x, const double loc_tplus ) { 
     mat_type dOmega = mat_type::Identity(8,8); 
     dOmega(7,7) = 0;
     //
@@ -311,20 +327,36 @@ namespace sac {
     //
     switch ( loc ) {
     case 0:
-      if ( x[1] >= 0 ) { 
-	dOmega(5,0) = 1; dOmega(5,6) = -L0*sin(x[6]); }
-      else { 
-	dOmega(5,0) = 1; dOmega(5,6) = L0*sin(x[6]); }
+      if ( ((int) (loc_tplus + .05)) == 1) {
+	if ( x[1] >= 0 ) { 
+	  dOmega(5,0) = 1; dOmega(5,6) = -L0*sin(x[6]); }
+	else { 
+	  dOmega(5,0) = 1; dOmega(5,6) = L0*sin(x[6]); }
+      }
       return dOmega;
     case 1:
       return dOmega;
     case 2:
-      if ( x[1] >= 0 ) {
-	dOmega(4,0) = 1; dOmega(4,6) = -L0*sin(x[6]); }
-      else {
-	dOmega(4,0) = 1; dOmega(5,6) = L0*sin(x[6]); }
+      if ( ((int) (loc_tplus + .05)) == 1) {
+	if ( x[1] >= 0 ) {
+	  dOmega(4,0) = 1; dOmega(4,6) = -L0*sin(x[6]); }
+	else {
+	  dOmega(4,0) = 1; dOmega(4,6) = L0*sin(x[6]); }
+      }
       return dOmega;
     case 3:
+      if ( ((int) (loc_tplus + .05)) == 0 ) {
+	if ( x[1] >= 0 ) {
+	  dOmega(4,0) = 1; dOmega(4,6) = -L0*sin(x[6]); }
+	else {
+	  dOmega(4,0) = 1; dOmega(4,6) = L0*sin(x[6]); }
+      }
+      else if ( ((int) (loc_tplus + .05)) == 2 ) {
+	if ( x[1] >= 0 ) {
+	  dOmega(5,0) = 1; dOmega(5,6) = -L0*sin(x[6]); }
+	else {
+	  dOmega(5,0) = 1; dOmega(5,6) = L0*sin(x[6]); }
+      }
       return dOmega;
     default:
       std::cout << "Location #" << loc << " has not been defined\n";
@@ -406,12 +438,14 @@ namespace sac {
 	      	throw std::make_pair(t,3.0); // t_i^+ and location q_{i+1}=3
 	      break;
 	    case 3:
-	      if ( (x[5] > x[4] && x[1] > 0 ) || (x[5] < x[4] && x[1] < 0 ) )
-	    	throw std::make_pair(t,0.0); // t_i^+ and location q_{i+1}=0
-	      else if ((x[4] > x[5] && x[1] > 0) || (x[4] < x[5] && x[1] < 0))
-	      	throw std::make_pair(t,2.0); // t_i^+ and location q_{i+1}=2
-	      else
-	      	std::cout << "case 3 unknown location q_{i+1}\n";
+	      if (x[3] < 0 ) {
+		if ( (x[5] >= x[4] && x[1] >= 0 ) 
+		     || (x[5] <= x[4] && x[1] <= 0 ) )
+		  throw std::make_pair(t,0.0); // t_i^+ and location q_{i+1}=0
+		else if ((x[4] > x[5] && x[1] > 0) 
+			 || (x[4] < x[5] && x[1] < 0))
+		  throw std::make_pair(t,2.0); // t_i^+ and location q_{i+1}=2
+	      }
 	      break;
 	    default:
 	      std::cout << "Location #" << (int)(x[7]+0.5) 

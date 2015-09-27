@@ -1,0 +1,151 @@
+Testing over range: { {-0.2, 0.2, 0.1}, {-0.2, 0.2, 0.1} }
+
+Testing params:
+
+Q = 
+0 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 0
+P = 
+ 0  0  0  0
+ 0  1  0  0
+ 0  0  0  0
+ 0  0  0 10
+R = 
+0.1
+T = 0.2
+lam = -15
+ts = 0.005
+calc_tm = 0.005
+u2search = 1
+usat = {7, -7}
+
+max allowed simulation time for convergence = 25
+testing x0 = (2.94159, 0, 2.94159, 0, )	dth1 = -0.2; dth2 = -0.2
+
+failed!!
+
+7.3055 seconds
+testing x0 = (2.94159, 0, 3.04159, 0, )	dth1 = -0.2; dth2 = -0.1
+
+failed!!
+
+7.4543 seconds
+testing x0 = (2.94159, 0, 3.14159, 0, )	dth1 = -0.2; dth2 = 0
+
+failed!!
+
+7.1290 seconds
+testing x0 = (2.94159, 0, 3.24159, 0, )	dth1 = -0.2; dth2 = 0.1
+
+failed!!
+
+6.9676 seconds
+testing x0 = (2.94159, 0, 3.34159, 0, )	dth1 = -0.2; dth2 = 0.2
+
+failed!!
+
+6.9927 seconds
+testing x0 = (3.04159, 0, 2.94159, 0, )	dth1 = -0.1; dth2 = -0.2
+
+failed!!
+
+7.4527 seconds
+testing x0 = (3.04159, 0, 3.04159, 0, )	dth1 = -0.1; dth2 = -0.1
+
+failed!!
+
+7.3462 seconds
+testing x0 = (3.04159, 0, 3.14159, 0, )	dth1 = -0.1; dth2 = 0
+
+failed!!
+
+6.6807 seconds
+testing x0 = (3.04159, 0, 3.24159, 0, )	dth1 = -0.1; dth2 = 0.1
+
+failed!!
+
+6.7075 seconds
+testing x0 = (3.04159, 0, 3.34159, 0, )	dth1 = -0.1; dth2 = 0.2
+
+failed!!
+
+6.8981 seconds
+testing x0 = (3.14159, 0, 2.94159, 0, )	dth1 = 0; dth2 = -0.2
+
+failed!!
+
+7.1646 seconds
+testing x0 = (3.14159, 0, 3.04159, 0, )	dth1 = 0; dth2 = -0.1
+
+failed!!
+
+7.0885 seconds
+testing x0 = (3.14159, 0, 3.14159, 0, )	dth1 = 0; dth2 = 0
+
+failed!!
+
+6.5831 seconds
+testing x0 = (3.14159, 0, 3.24159, 0, )	dth1 = 0; dth2 = 0.1
+
+failed!!
+
+6.8335 seconds
+testing x0 = (3.14159, 0, 3.34159, 0, )	dth1 = 0; dth2 = 0.2
+
+failed!!
+
+7.8225 seconds
+testing x0 = (3.24159, 0, 2.94159, 0, )	dth1 = 0.1; dth2 = -0.2
+
+failed!!
+
+7.1501 seconds
+testing x0 = (3.24159, 0, 3.04159, 0, )	dth1 = 0.1; dth2 = -0.1
+
+failed!!
+
+7.1458 seconds
+testing x0 = (3.24159, 0, 3.14159, 0, )	dth1 = 0.1; dth2 = 0
+
+failed!!
+
+7.7987 seconds
+testing x0 = (3.24159, 0, 3.24159, 0, )	dth1 = 0.1; dth2 = 0.1
+
+failed!!
+
+7.0801 seconds
+testing x0 = (3.24159, 0, 3.34159, 0, )	dth1 = 0.1; dth2 = 0.2
+
+failed!!
+
+7.0777 seconds
+testing x0 = (3.34159, 0, 2.94159, 0, )	dth1 = 0.2; dth2 = -0.2
+
+failed!!
+
+7.1807 seconds
+testing x0 = (3.34159, 0, 3.04159, 0, )	dth1 = 0.2; dth2 = -0.1
+
+failed!!
+
+7.1677 seconds
+testing x0 = (3.34159, 0, 3.14159, 0, )	dth1 = 0.2; dth2 = 0
+
+failed!!
+
+7.1690 seconds
+testing x0 = (3.34159, 0, 3.24159, 0, )	dth1 = 0.2; dth2 = 0.1
+
+failed!!
+
+7.1861 seconds
+testing x0 = (3.34159, 0, 3.34159, 0, )	dth1 = 0.2; dth2 = 0.2
+
+failed!!
+
+7.1479 seconds
+Total time:
+178.5309 seconds

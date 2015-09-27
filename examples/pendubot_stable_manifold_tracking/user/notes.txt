@@ -1,0 +1,6 @@
+master.hpp for constant integration
+
+cost and inc_cost.hpp for manifold derivatives but only manually finite differencing in inc_cost for Glofx seems to work.  I have not done this in cost.hpp so gradient of terminal cost will not be correct. I don't know why my 1st way of doing things by finite differencing xdes does not work.
+
+
+a second copy cost.hpp is required if not using the inc_cost.hpp and cost.hpp with manifold derivatives in order to fix terminal cost issues for xdes(x).

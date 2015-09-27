@@ -73,6 +73,18 @@
  * t_lx and t_rx reset impulsively at phase transitions
  */
 
+/* 
+ISSUES:
+ --- The left / right leg don't always switch in the right order when transitioning to / from flight phase and changing directions
+ --- Before I added the flight phase -- see commit b8ddec2859 -- dynamic walking is more stable and converges more robustly to the resluts described in the Geyer paper; dynamic hopping tends to fall if simulated for ~10s after I add the flight phase; consider adjusting touchdown angle and other params to find ones that provide better / more robust stable walking.
+ --- In commit b8ddec2859 -- the commit before I added the flight phase -- the derivative, DOmega, for "case 2" is wrong (i.e. dOmega(5,6) -> dOmega(4,6)).
+ --- I need to clean up and simplify this code.
+ --- I need a better / faster way to search for switching events --- Golden section or using gradient info.
+ --- Add a finite differencing function to test user provided linearizations and derivative terms.
+ --- Add a fall mode with plastic impact to encourage the system not to fall.
+ --- Foot placement issue -- touchdown angle is assumed to be acute and I use the sign of x' to determine walking direction and if a foot should be placed to the left or right.  If I initialize the system in the aerial phase with x' = 0, it can't change the touch down angle to get the foot to touch down on the left side.  Note, even if there is a way to specify a negative angle to place foot on the left, it would require dramatic changes in angle when switching foot placement between left and right.
+ */
+
 /******************************************************************/
 /* Reserve max matrix NxN dims if known at compile time for speed */
 /* Must at least be the max(x_len,u_len).                         */
@@ -97,15 +109,15 @@ int main(int /* argc */ , char** /* argv */ )
     params.lam() = -10;
     params.maxdt() = 0.2;
     params.ts() = 0.01;
-    params.usat() = { {.1, -.1}, {1, -1} };
+    params.usat() = { {10, -10}, {10, -10} };
     params.calc_tm() = params.ts();
-    params.u2search() = false;
+    params.u2search() = false; // true;
     params.Q() = mat_type::Zero(params.xlen(),params.xlen());
     params.P() = mat_type::Zero(params.xlen(),params.xlen());
     params.R() = mat_type::Identity(params.ulen(),params.ulen());
-    params.Q()(1,1) = 100; // params.Q()(3,3) = 100;// params.Q()(2,2) = 100;
+    params.Q()(1,1) = 100; /*params.Q()(3,3) = 100;*/ //params.Q()(2,2) = 100;
     params.x_des = []( const double & /*t*/, const state_type & /*x*/,
-    		       vec_type & xdes) { xdes << 0, 1.2, 1, 0, 
+    		       vec_type & xdes) { xdes << 0, 1.1, 1.5, 0, 
     					  0, 0, 69.0*PI/180.0, 0; };
 
     /* initialize SAC stepper */
@@ -113,10 +125,10 @@ int main(int /* argc */ , char** /* argv */ )
 
     /* simulation start/stop times */
     double t0=0.0, tsim = 10;
-    
+        
     /* initial state and control */
-    state_type x0(params.xlen());    x0 = { 0, 0 /* .883 for Es = 816J */, 
-    					    1-.056, 0, 0, 0, 69*PI/180.0, 0 };
+    state_type x0(params.xlen());    x0 = { 0, 0 /* 1.154 for Es = 816J */,
+    					    1-0.056, 0, 0, 0, 69.0*PI/180.0, 0 };
     b_control u1(params);     u1.stimes( 0, params.calc_tm() );
 
     /* compute final trajectory cost */
