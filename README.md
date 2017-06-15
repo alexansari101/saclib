@@ -27,7 +27,14 @@ Ansari, Alexander R., and Todd D. Murphey. "Sequential action control: closed-fo
 *Please include a reference* if you use this software.  For convenience, the bibtex is provided:
 
 ```
-@article{ansari2016,
+@Misc{sacSoftware17,
+author =   {Alexander R Ansari and Todd D Murphey},
+title =    {{SAClib}: {A} library implementation of sequential action control},
+howpublished = {\url{http://github.com/alexansari101/saclib}},
+year = {2017}
+}
+
+@article{sacTRO2016,
   title={Sequential action control: closed-form optimal control for nonlinear and nonsmooth systems},
   author={Alexander R Ansari and Todd D Murphey},
   journal={IEEE Transactions on Robotics},
