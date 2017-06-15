@@ -29,7 +29,7 @@ Ansari, Alexander R., and Todd D. Murphey. "Sequential action control: closed-fo
 ```
 @Misc{SACSoftware2017,
 author =   {Alexander R Ansari and Todd D Murphey},
-title =    {{SAClib}: {A} {C++} header-only library implementation of sequential action control (SAC)},
+title =    {{SAClib}: {A} {C++} header-only library implementation of sequential action control {(SAC)}},
 howpublished = {\url{http://github.com/alexansari101/saclib}},
 year = {2017}
 }
