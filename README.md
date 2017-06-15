@@ -6,7 +6,7 @@ The code closesly follows the paper referenced in the **Citations** section.
 
 ## Overview
 
-**Requirements:** Boost.
+**Requirements:** Boost.  Software has been compiled and tested on GCC 4 (Ubuntu 14.04) and GCC 5 (Ubuntu 16.04).
 
 **Documentation:** A pdf reference manual is included in the ./doc folder.  Use doxygen to update the project's documentation.
 
@@ -46,3 +46,7 @@ year = {2017}
   publisher={IEEE}
 }
 ```
+
+## Contributing
+
+We encourage contributions to this library.  The library source files can be found in the ./lib/src folder.  Use Doxygen style comments.  Test code with appropriate unit tests and ensure the examples compile/run.   
