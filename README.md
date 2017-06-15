@@ -2,7 +2,7 @@
 
 An efficient C++ implementation of sequential action control (SAC) for rapid online control of nonlinear dynamic systems.  This header-only library computes constrained optimal controls online to drive nonlinear robots according to an objective function, i.e., it is similar to nonlinear receding horizon control.  
 
-The code closesly follows the reference in the **Citations** section.
+The code closesly follows the paper referenced in the **Citations** section.
 
 ## Overview
 
