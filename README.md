@@ -6,13 +6,15 @@ The code closesly follows the paper referenced in the **Citations** section.
 
 ## Overview
 
-**Requirements:** Boost.  Software has been compiled and tested on GCC 4 (Ubuntu 14.04) and GCC 5 (Ubuntu 16.04).
+**Requirements:** Boost (the examples use several of the optional compiled Boost libraries).  This software has been compiled and tested on GCC 4 (Ubuntu 14.04) and GCC 5 (Ubuntu 16.04).
 
 **Documentation:** A pdf reference manual is included in the ./doc folder.  Use doxygen to update the project's documentation.
 
 **Getting Started:** See the examples in the ./examples folder.  For instance, the ./examples/Cart_and_Pend_full/ folder provides an example which uses the SAC library to invert a Cart and Pendulum system.  
 
-The 'user' subfolder in each example, e.g., ./examples/Cart_and_Pend_full/user, is where the user should implement (or override) any class definitions required to implement dynamics, linearizations, or specialty cost functions.  In the Cart_and_Pend_full example, the dynamics and linearizations of the cart pendulum are provided and SAC optimizes a default quadratic cost functional to solve for controls.
+The 'user' subfolder in each example, e.g., ./examples/Cart_and_Pend_full/user, is where the user should implement (or override) any class definitions required to implement dynamics, linearizations, or specialty cost functions.  In the Cart_and_Pend_full example, the dynamics and linearizations of the cart pendulum are provided and SAC optimizes a default quadratic cost functional to solve for controls as described in the Transactions on Robotics Paper in the **Citations** section.
+
+Remember to edit the Makefile in each example folder in order to link to the installed location of the SAClib library.  Build each example by calling "make" from within the folder pertaining to the appropriate example.
 
 ## Citations
 
