@@ -23,7 +23,7 @@ namespace sac {
   */
   inline double zGrndToe( const double& x, const double& y ) {     
     // return .5*x+0.3*cos(4.0*x - PI)*cos(4.0*y - PI); // 0.3*cos(4.0*x - PI);
-    return 0.5*( smStep(x,.7) + smStep(x,1.4) + smStep(x,2.1) + smStep(x,2.8) ) ;
+    return .5*( smStep(x,.7) + smStep(x,1.4) + smStep(x,2.1) + smStep(x,2.8) ) ;
     // return 0;
   }
   /*!
@@ -38,8 +38,8 @@ namespace sac {
     // NOTE!!! This used to be Dgrnd[4]= Fun(x[4]).. 
     //         but zGrnd is fun of x[6] and x[7] only!
     // Dgrnd[6]= /*.5*/-1.2*sin(4.0*x[6]-PI); // Dgrnd[6]= -1.2*sin(4.0*x[6]-PI);
-    Dgrnd[6] = 0.5*( DsmStep(x[6],.7) + DsmStep(x[6],1.4) 
-		     + DsmStep(x[6],2.1) + DsmStep(x[6],2.8) ) ;
+    Dgrnd[6] = .5*( DsmStep(x[6],.7) + DsmStep(x[6],1.4) 
+		    + DsmStep(x[6],2.1) + DsmStep(x[6],2.8) ) ;
     // double finite difference
     // static double dx = .1;
     // Dgrnd[6]= (zGrndToe(x[6]+dx,x[7])-zGrndToe(x[6]-dx,x[7]))/(2.0*dx);

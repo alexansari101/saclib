@@ -45,52 +45,13 @@ namespace sac {
   // }
 
   /* FOR SINUSOIDAL FLOOR EXAMPLE */
-  // //[ guard equations
-  // double Phiq1q1( const state_type &x ) { return x[1] - 0.3*cos(8*x[0]); }
-
-  // mat_type DPhiq1q1( const state_type &x ) { 
-  //   mat_type DPhi = mat_type::Zero(1,4);
-  //   DPhi(0,0) = 2.4*sin(8.0*x[0]);
-  //   DPhi(0,1) = 1.0;
-  //   return DPhi; 
-  // }
-  // //]
-
-  // //[ reset maps
-  // state_type Omegaq1q1( const state_type &x ) { 
-  //   state_type Omega = x;
-  //   Omega[2] = ((47.0 - 72.0*cos(16.0*x[0]))*x[2] + 120.0*sin(8.0*x[0])*x[3])
-  //     /(-97.0 + 72.0*cos(16.0*x[0]));
-  //   Omega[3] = (120.0*sin(8.0*x[0])*x[2] + (-47.0 + 72.0*cos(16.0*x[0]))*x[3])
-  //     /(-97.0 + 72.0*cos(16.0*x[0]));
-  //   return Omega; 
-  // }
-  
-  // mat_type DOmegaq1q1( const state_type &x ) { 
-  //   mat_type DOmega = mat_type::Identity(4,4);
-  //   //
-  //   DOmega(2,0) = -((960.0*cos(8.0*x[0])*(120.0*sin(8.0*x[0])*x[2] +
-  // 					  (-47.0 + 72.0*cos(16.0*x[0]))*x[3]))
-  // 		    / pow((97.0 - 72.0*cos(16.0*x[0])),2));
-  //   DOmega(2,2) = -1.0 + 50.0/(97.0 - 72.0*cos(16.0*x[0]));
-  //   DOmega(2,3) = (120.0*sin(8.0*x[0]))/(-97.0 + 72.0*cos(16.0*x[0]));
-  //   //
-  //   DOmega(3,0) = (960.0*((11.0*cos(8.0*x[0]) - 36.0*cos(24.0*x[0]))*x[2] + 
-  // 			  60.0*sin(16.0*x[0])*x[3]))
-  //     /pow( (97.0 - 72.0*cos(16.0*x[0])) ,2);
-  //   DOmega(3,2) = (120.0*sin(8.0*x[0]))/(-97.0 + 72.0*cos(16.0*x[0]));
-  //   DOmega(3,3) = 1.0 + 50.0/(-97.0 + 72.0*cos(16.0*x[0]));
-  //   //
-  //   return DOmega; 
-  // }
-  
-  /* FOR SIMPLE BOUNCING BALL EXAMPLE */
   //[ guard equations
-  double Phiq1q1( const state_type &x ) { return x[1]; }
+  double Phiq1q1( const state_type &x ) { return x[1] - 0.3*cos(8*x[0]); }
 
-  mat_type DPhiq1q1( const state_type &/*x*/ ) { 
+  mat_type DPhiq1q1( const state_type &x ) { 
     mat_type DPhi = mat_type::Zero(1,4);
-    DPhi(0,1) = 1;
+    DPhi(0,0) = 2.4*sin(8.0*x[0]);
+    DPhi(0,1) = 1.0;
     return DPhi; 
   }
   //]
@@ -98,15 +59,54 @@ namespace sac {
   //[ reset maps
   state_type Omegaq1q1( const state_type &x ) { 
     state_type Omega = x;
-    Omega[3] = -Omega[3];
+    Omega[2] = ((47.0 - 72.0*cos(16.0*x[0]))*x[2] + 120.0*sin(8.0*x[0])*x[3])
+      /(-97.0 + 72.0*cos(16.0*x[0]));
+    Omega[3] = (120.0*sin(8.0*x[0])*x[2] + (-47.0 + 72.0*cos(16.0*x[0]))*x[3])
+      /(-97.0 + 72.0*cos(16.0*x[0]));
     return Omega; 
   }
   
-  mat_type DOmegaq1q1( const state_type &/*x*/ ) { 
+  mat_type DOmegaq1q1( const state_type &x ) { 
     mat_type DOmega = mat_type::Identity(4,4);
-    DOmega(3,3) = -1;
+    //
+    DOmega(2,0) = -((960.0*cos(8.0*x[0])*(120.0*sin(8.0*x[0])*x[2] +
+  					  (-47.0 + 72.0*cos(16.0*x[0]))*x[3]))
+  		    / pow((97.0 - 72.0*cos(16.0*x[0])),2));
+    DOmega(2,2) = -1.0 + 50.0/(97.0 - 72.0*cos(16.0*x[0]));
+    DOmega(2,3) = (120.0*sin(8.0*x[0]))/(-97.0 + 72.0*cos(16.0*x[0]));
+    //
+    DOmega(3,0) = (960.0*((11.0*cos(8.0*x[0]) - 36.0*cos(24.0*x[0]))*x[2] + 
+  			  60.0*sin(16.0*x[0])*x[3]))
+      /pow( (97.0 - 72.0*cos(16.0*x[0])) ,2);
+    DOmega(3,2) = (120.0*sin(8.0*x[0]))/(-97.0 + 72.0*cos(16.0*x[0]));
+    DOmega(3,3) = 1.0 + 50.0/(-97.0 + 72.0*cos(16.0*x[0]));
+    //
     return DOmega; 
   }
+  
+  // /* FOR SIMPLE BOUNCING BALL EXAMPLE */
+  // //[ guard equations
+  // double Phiq1q1( const state_type &x ) { return x[1]; }
+
+  // mat_type DPhiq1q1( const state_type &/*x*/ ) { 
+  //   mat_type DPhi = mat_type::Zero(1,4);
+  //   DPhi(0,1) = 1;
+  //   return DPhi; 
+  // }
+  // //]
+
+  // //[ reset maps
+  // state_type Omegaq1q1( const state_type &x ) { 
+  //   state_type Omega = x;
+  //   Omega[3] = -Omega[3];
+  //   return Omega; 
+  // }
+  
+  // mat_type DOmegaq1q1( const state_type &/*x*/ ) { 
+  //   mat_type DOmega = mat_type::Identity(4,4);
+  //   DOmega(3,3) = -1;
+  //   return DOmega; 
+  // }
   
   mat_type Piq1q1( const state_type &x_minus, const vec_type &f_minus,
   		   const vec_type &f_plus ) { 

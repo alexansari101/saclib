@@ -23,7 +23,7 @@ int main(int /* argc */ , char** /* argv */ )
 
     /* initialize SAC parameters */
     Params params(4,2);
-    params.T() = 0.5; // 0.5; 0.75
+    params.T() = 0.75; // 0.5; 0.75
     params.lam() = -10;
     params.maxdt() = 0.2;
     params.ts() = 0.01;
@@ -36,8 +36,8 @@ int main(int /* argc */ , char** /* argv */ )
     params.P()(0,0) = 10;
     params.R()(0,0) = 1; params.R()(1,1) = 1;
     params.x_des = []( const double & /*t*/, const state_type & /*x*/,
-		       vec_type & xdes) { xdes << 1.0, 1.0, 0, 0; };
-    params.mxdes_tf() << 1.0, 1.0, 0, 0;
+		       vec_type & xdes) { xdes << /*1.0*/.8, 1.0, 0, 0; };
+    params.mxdes_tf() << /*1.0*/.8, 1.0, 0, 0;
 
     /* initialize SAC stepper */
     sac_step SACit( params );

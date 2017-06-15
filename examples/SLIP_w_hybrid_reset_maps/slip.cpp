@@ -123,7 +123,7 @@ int main(int /* argc */ , char** /* argv */ )
     // Sample points uniformly in an interval centered on the components 
     // of xorig
     double interval = 0.4;
-    for (size_t its=0; its < 10; its++) {
+    for (size_t its=0; its < 25; its++) {
       //[ Randomize Initial state around xorig
       x0 = xorig;
       t0=0.0;
