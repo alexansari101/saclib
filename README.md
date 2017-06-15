@@ -1,4 +1,4 @@
-# saclib
+# SAClib
 
 An efficient C++ implementation of sequential action control (SAC) for rapid online control of nonlinear dynamic systems.  This header-only library computes constrained optimal controls online to drive nonlinear robots according to an objective function, i.e., it is similar to nonlinear receding horizon control.  
 
@@ -27,9 +27,9 @@ Ansari, Alexander R., and Todd D. Murphey. "Sequential action control: closed-fo
 *Please include a reference* if you use this software.  For convenience, the bibtex is provided:
 
 ```
-@Misc{sacSoftware17,
+@Misc{SACSoftware2017,
 author =   {Alexander R Ansari and Todd D Murphey},
-title =    {{SAClib}: {A} library implementation of sequential action control},
+title =    {{SAClib}: {A} {C++} header-only library implementation of sequential action control (SAC)},
 howpublished = {\url{http://github.com/alexansari101/saclib}},
 year = {2017}
 }
