@@ -1,0 +1,42 @@
+\form#0:$\dot \rho(t) = -\frac{\partial l}{\partial x}^T - \frac{\partial f}{\partial x}^T \rho(t)$
+\form#1:$\rho(t)$
+\form#2:$\frac{\partial l}{\partial x}$
+\form#3:$\tau_1 \leq t \leq \tau_2$
+\form#4:$\tau_1$
+\form#5:$\tau_2$
+\form#6:$J_1 = \int_{t_0}^{t_f} l(x(t))dt + m(x(t_f))$
+\form#7:$m(x(t_f))$
+\form#8:$(x(t_f)-x_{des}(t_f))^T\;P_1\;(x(t_f)-x_{des}(t_f))$
+\form#9:$D_x m(x(t_f))$
+\form#10:$P_1\;(x(t_f)-x_{des}(t_f))$
+\form#11:$D_x m(x(t_f))^T$
+\form#12:$l(x)$
+\form#13:$J_1 = \int_{t_0}^{t_f} l(x(t)) dt + m(x(t_f))$
+\form#14:$J_1 = \int_{t_0}^{t_f} l(x) \, dt + m(x(t_f))$
+\form#15:$D_x l(x)^T$
+\form#16:$t_0$
+\form#17:$t_f$
+\form#18:$a<b<c$
+\form#19:$t0 \leq t \leq tf$
+\form#20:$\rho$
+\form#21:$\rho(t_f)$
+\form#22:$\rho(t_0)$
+\form#23:$ \in [-\pi, \pi)$
+\form#24:$\frac{dJ1}{d\lambda^+}(t) = \rho(t)^T[ f(u_2^*(t))-f(u_1(t)) ]$
+\form#25:$u_2^*(t)$
+\form#26:$\frac{dJ1} {d\lambda^+}(t)$
+\form#27:\[\frac{dJ1}{d\lambda^+}(t) = \rho(t)^T[ f(u_2^*(t))-f(u_1(t)) ]\]
+\form#28:$D_x l(x)$
+\form#29:$l(x(t))$
+\form#30:$J_1 = \frac{1}{2}\int_{t_0}^{t_f} (x-x_{des})^T Q\, (x-x_{des}) + u^T R\, u \, dt + \frac{1}{2}(x-x_{des})^T P\, (x-x_{des})$
+\form#31:$x_{des}(t_f)$
+\form#32:$l(x(t),u(t))$
+\form#33:$J = \int_{t_0}^{t_f} l(x(t),u(t)) \, dt + m(x(t_f))$
+\form#34:$cost(t) = \sqrt{u_2^*(t)^T u_2^*(t)} + \frac{dJ_1}{d \lambda^+}(t) + t^{1.6}$
+\form#35:$\frac{dJ_1}{d \lambda^+}(t)$
+\form#36:\[cost(t) = \sqrt{u_2^*(t)^T u_2^*(t)} + \frac{dJ_1}{d \lambda^+}(t) + t^{1.6}\]
+\form#37:\[u_2^*(t) = \; (\Lambda + R)^{-1} \, [\Lambda \, u_1(t) + h(x(t))^T \rho(t) \, \alpha_d]\]
+\form#38:$\Lambda = h(x(t))^T \rho(t) \rho(t)^T h(x(t))$
+\form#39:$h(x(t)) = \frac{\partial f_1}{\partial u_1}$
+\form#40:$f_1$
+\form#41:$\frac{\Delta J_1}{\Delta t}$
