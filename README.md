@@ -27,7 +27,7 @@ Remember to __edit the Makefile__ in each example folder so that they link to th
 The SAC library is based on:
 
 ```
-Ansari, Alexander R., and Todd D. Murphey. "Sequential action control: closed-form optimal control for nonlinear and nonsmooth systems." IEEE Transactions on Robotics 32.5 (2016): 1196-1214.
+Alexander R. Ansari, and Todd D. Murphey. "Sequential action control: closed-form optimal control for nonlinear and nonsmooth systems." IEEE Transactions on Robotics 32.5 (2016): 1196-1214.
 ```
 
 *Please include a reference* if you use this software.  For convenience, the bibtex is provided:
