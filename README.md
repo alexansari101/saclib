@@ -49,4 +49,6 @@ year = {2017}
 
 ## Contributing
 
-We encourage contributions to this library.  The library source files can be found in the ./lib/src folder.  Use Doxygen style comments.  Test code with appropriate unit tests and ensure the examples compile/run.   
+We encourage contributions to this library.  The library source files can be found in the ./lib/src folder.  Use Doxygen style comments.  Test code with appropriate unit tests and ensure the examples compile/run.
+
+Contributors should add their names to the AUTHORS file.
