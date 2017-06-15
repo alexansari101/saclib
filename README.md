@@ -16,9 +16,9 @@ The 'user' subfolder in each example, e.g., ./examples/Cart_and_Pend_full/user, 
 
 ## Citations
 
-*SAC was developed by Alex Ansari and Prof. Todd D. Murphey in Todd's laboratory within Northwestern University's Neuroscience and Robotics (NxR) Laboratory.  The work was supported by the National Science Foundation under Grant CMMI 1200321.*
+*This code was created while working on the sequential action control method with Prof. Todd Murphey in his robotics laboratory at Northwestern University.*
 
-This SAC library is based on:
+The SAC library is based on:
 
 ```
 Ansari, Alexander R., and Todd D. Murphey. "Sequential action control: closed-form optimal control for nonlinear and nonsmooth systems." IEEE Transactions on Robotics 32.5 (2016): 1196-1214.
