@@ -12,9 +12,9 @@ The code closesly follows the paper referenced in the **Citations** section.
 
 **Getting Started:** See the examples in the ./examples folder.  For instance, the ./examples/Cart_and_Pend_full/ folder provides an example which uses the SAC library to invert a Cart and Pendulum system.  
 
-The 'user' subfolder in each example, e.g., ./examples/Cart_and_Pend_full/user, is where the user should implement (or override) any class definitions required to implement dynamics, linearizations, or specialty cost functions.  In the Cart_and_Pend_full example, the dynamics and linearizations of the cart pendulum are provided and SAC optimizes a default quadratic cost functional to solve for controls as described in the Transactions on Robotics Paper in the **Citations** section.
+The 'user' subfolder in each example, e.g., ./examples/Cart_and_Pend_full/user, is where the user should implement (or override) any class definitions required to implement dynamics, linearizations, or specialty cost functions.  In the Cart_and_Pend_full example, the dynamics and linearizations of the cart pendulum are provided and SAC optimizes a default quadratic cost functional to solve for controls as described in the Transactions on Robotics Paper (see **Citations**).
 
-Remember to edit the Makefile in each example folder in order to link to the installed location of the SAClib library.  Build each example by calling "make" from within the folder pertaining to the appropriate example.
+Remember to edit the Makefile in each example folder so that they link to the installed location of the SAClib library.  Build each example by calling "make" from within the folder pertaining to the appropriate example.
 
 ## Citations
 
