@@ -10,11 +10,15 @@ The code closesly follows the paper referenced in the **Citations** section.
 
 **Documentation:** A pdf reference manual is included in the ./doc folder.  Use doxygen to update the project's documentation.
 
-**Getting Started:** See the examples in the ./examples folder.  For instance, the ./examples/Cart_and_Pend_full/ folder provides an example which uses the SAC library to invert a Cart and Pendulum system.  
+**Getting Started:** Install a local copy of saclib to your computer by cloning this repository.  
+
+For examples of how to use this library see the examples in the ./examples folder.  For instance, the ./examples/Cart_and_Pend_full/ folder provides an example that uses the SAC library to invert an acceleration controlled cart and pendulum system.  This example uses a default, quadratic (LQR-like) state tracking objective that measures the error between the current state (configuration + velocities) of the cart and penulum system and the origin (inverted equilibrium).  To minimize this objective, SAC computes constrained acceleration controls that move the cart laterally in order to invert the pendulum.  
 
 The 'user' subfolder in each example, e.g., ./examples/Cart_and_Pend_full/user, is where the user should implement (or override) any class definitions required to implement dynamics, linearizations, or specialty cost functions.  In the Cart_and_Pend_full example, the dynamics and linearizations of the cart pendulum are provided and SAC optimizes a default quadratic cost functional to solve for controls as described in the Transactions on Robotics Paper (see **Citations**).
 
-Remember to edit the Makefile in each example folder so that they link to the installed location of the SAClib library.  Build each example by calling "make" from within the folder pertaining to the appropriate example.
+Note: The user can override any header file in the library by including a user modified copy in an example's 'user' folder.
+
+Remember to __edit the Makefile__ in each example folder so that they link to the installed location of the SAClib library.  Build each example by calling "make" from within the folder pertaining to the appropriate example.
 
 ## Citations
 
