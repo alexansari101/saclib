@@ -1,6 +1,6 @@
 # saclib
 
-An efficient C++ implementation of Sequential Action Control for rapid online control of nonlinear dynamic systems.  This header-only library computes constrained optimal controls online to drive nonlinear robots according to an objective function, i.e., it is similar to nonlinear receding horizon control.  
+An efficient C++ implementation of sequential action control (SAC) for rapid online control of nonlinear dynamic systems.  This header-only library computes constrained optimal controls online to drive nonlinear robots according to an objective function, i.e., it is similar to nonlinear receding horizon control.  
 
 The code closesly follows the reference in the **Citations** section.
 
@@ -16,7 +16,9 @@ The 'user' subfolder in each example, e.g., ./examples/Cart_and_Pend_full/user, 
 
 ## Citations
 
-This library is based on:
+*SAC was developed by Alex Ansari and Prof. Todd D. Murphey in Todd's laboratory within Northwestern University's Neuroscience and Robotics (NxR) Laboratory.  The work was supported by the National Science Foundation under Grant CMMI 1200321.*
+
+This SAC library is based on:
 
 ```
 Ansari, Alexander R., and Todd D. Murphey. "Sequential action control: closed-form optimal control for nonlinear and nonsmooth systems." IEEE Transactions on Robotics 32.5 (2016): 1196-1214.
@@ -36,5 +38,3 @@ Ansari, Alexander R., and Todd D. Murphey. "Sequential action control: closed-fo
   publisher={IEEE}
 }
 ```
-
-SAC was developed by Alex Ansari and Prof. Todd D. Murphey in Todd's laboratory within Northwestern University's Neuroscience and Robotics (NxR) Laboratory.  This work was supported by the National Science Foundation under Grant CMMI 1200321.
