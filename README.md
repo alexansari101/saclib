@@ -10,7 +10,7 @@ The code closesly follows the paper referenced in the **Citations** section.
 
 **Documentation:** A pdf reference manual is included in the ./doc folder.  Use doxygen to update the project's documentation.
 
-**Getting Started:** Install a local copy of saclib to your computer by cloning this repository.  
+**Getting Started:** Install a local copy of SAClib to your computer by cloning this repository.  
 
 For examples of how to use this library see the examples in the ./examples folder.  For instance, the ./examples/Cart_and_Pend_full/ folder provides an example that uses the SAC library to invert an acceleration controlled cart and pendulum system.  This example uses a default, quadratic (LQR-like) state tracking objective that measures the error between the current state (configuration + velocities) of the cart and penulum system and the origin (inverted equilibrium).  To minimize this objective, SAC computes constrained acceleration controls that move the cart laterally in order to invert the pendulum.  
 
