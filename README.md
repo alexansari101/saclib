@@ -33,7 +33,8 @@ title =    {{SAClib}: {A} {C++} header-only library implementation of sequential
 howpublished = {\url{http://github.com/alexansari101/saclib}},
 year = {2017}
 }
-
+```
+```
 @article{sacTRO2016,
   title={Sequential action control: closed-form optimal control for nonlinear and nonsmooth systems},
   author={Alexander R Ansari and Todd D Murphey},
